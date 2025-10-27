@@ -1,0 +1,1367 @@
+network "Unknown" {
+}
+variable N0_7muVerMo {
+  type discrete [ 4 ] = { StrongUp, WeakUp, Neutral, Down };
+}
+variable SubjVertMo {
+  type discrete [ 4 ] = { StronUp, WeakUp, Neutral, Down };
+}
+variable QGVertMotion {
+  type discrete [ 4 ] = { StrongUp, WeakUp, Neutral, Down };
+}
+variable CombVerMo {
+  type discrete [ 4 ] = { StrongUp, WeakUp, Neutral, Down };
+}
+variable AreaMeso_ALS {
+  type discrete [ 4 ] = { StrongUp, WeakUp, Neutral, Down };
+}
+variable SatContMoist {
+  type discrete [ 4 ] = { VeryWet, Wet, Neutral, Dry };
+}
+variable RaoContMoist {
+  type discrete [ 4 ] = { VeryWet, Wet, Neutral, Dry };
+}
+variable CombMoisture {
+  type discrete [ 4 ] = { VeryWet, Wet, Neutral, Dry };
+}
+variable AreaMoDryAir {
+  type discrete [ 4 ] = { VeryWet, Wet, Neutral, Dry };
+}
+variable VISCloudCov {
+  type discrete [ 3 ] = { Cloudy, PC, Clear };
+}
+variable IRCloudCover {
+  type discrete [ 3 ] = { Cloudy, PC, Clear };
+}
+variable CombClouds {
+  type discrete [ 3 ] = { Cloudy, PC, Clear };
+}
+variable CldShadeOth {
+  type discrete [ 3 ] = { Cloudy, PC, Clear };
+}
+variable AMInstabMt {
+  type discrete [ 3 ] = { None, Weak, Strong };
+}
+variable InsInMt {
+  type discrete [ 3 ] = { None, Weak, Strong };
+}
+variable WndHodograph {
+  type discrete [ 4 ] = { DCVZFavor, StrongWest, Westerly, Other };
+}
+variable OutflowFrMt {
+  type discrete [ 3 ] = { None, Weak, Strong };
+}
+variable MorningBound {
+  type discrete [ 3 ] = { None, Weak, Strong };
+}
+variable Boundaries {
+  type discrete [ 3 ] = { None, Weak, Strong };
+}
+variable CldShadeConv {
+  type discrete [ 3 ] = { None, Some, Marked };
+}
+variable CompPlFcst {
+  type discrete [ 3 ] = { IncCapDecIns, LittleChange, DecCapIncIns };
+}
+variable CapChange {
+  type discrete [ 3 ] = { Decreasing, LittleChange, Increasing };
+}
+variable LoLevMoistAd {
+  type discrete [ 4 ] = { StrongPos, WeakPos, Neutral, Negative };
+}
+variable InsChange {
+  type discrete [ 3 ] = { Decreasing, LittleChange, Increasing };
+}
+variable MountainFcst {
+  type discrete [ 3 ] = { XNIL, SIG, SVR };
+}
+variable Date {
+  type discrete [ 6 ] = { May15_Jun14, Jun15_Jul1, Jul2_Jul15, Jul16_Aug10, Aug11_Aug20, Aug20_Sep15 };
+}
+variable Scenario {
+  type discrete [ 11 ] = { A, B, C, D, E, F, G, H, I, J, K };
+}
+variable ScenRelAMCIN {
+  type discrete [ 2 ] = { AB, CThruK };
+}
+variable MorningCIN {
+  type discrete [ 4 ] = { None, PartInhibit, Stifling, TotalInhibit };
+}
+variable AMCINInScen {
+  type discrete [ 3 ] = { LessThanAve, Average, MoreThanAve };
+}
+variable CapInScen {
+  type discrete [ 3 ] = { LessThanAve, Average, MoreThanAve };
+}
+variable ScenRelAMIns {
+  type discrete [ 6 ] = { ABI, CDEJ, F, G, H, K };
+}
+variable LIfr12ZDENSd {
+  type discrete [ 4 ] = { LIGt0, N1GtLIGt_4, N5GtLIGt_8, LILt_8 };
+}
+variable AMDewptCalPl {
+  type discrete [ 3 ] = { Instability, Neutral, Stability };
+}
+variable AMInsWliScen {
+  type discrete [ 3 ] = { LessUnstable, Average, MoreUnstable };
+}
+variable InsSclInScen {
+  type discrete [ 3 ] = { LessUnstable, Average, MoreUnstable };
+}
+variable ScenRel3_4 {
+  type discrete [ 5 ] = { ACEFK, B, D, GJ, HI };
+}
+variable LatestCIN {
+  type discrete [ 4 ] = { None, PartInhibit, Stifling, TotalInhibit };
+}
+variable LLIW {
+  type discrete [ 4 ] = { Unfavorable, Weak, Moderate, Strong };
+}
+variable CurPropConv {
+  type discrete [ 4 ] = { None, Slight, Moderate, Strong };
+}
+variable ScnRelPlFcst {
+  type discrete [ 11 ] = { A, B, C, D, E, F, G, H, I, J, K };
+}
+variable PlainsFcst {
+  type discrete [ 3 ] = { XNIL, SIG, SVR };
+}
+variable N34StarFcst {
+  type discrete [ 3 ] = { XNIL, SIG, SVR };
+}
+variable R5Fcst {
+  type discrete [ 3 ] = { XNIL, SIG, SVR };
+}
+variable Dewpoints {
+  type discrete [ 7 ] = { LowEvrywhere, LowAtStation, LowSHighN, LowNHighS, LowMtsHighPl, HighEvrywher, Other };
+}
+variable LowLLapse {
+  type discrete [ 4 ] = { CloseToDryAd, Steep, ModerateOrLe, Stable };
+}
+variable MeanRH {
+  type discrete [ 3 ] = { VeryMoist, Average, Dry };
+}
+variable MidLLapse {
+  type discrete [ 3 ] = { CloseToDryAd, Steep, ModerateOrLe };
+}
+variable MvmtFeatures {
+  type discrete [ 4 ] = { StrongFront, MarkedUpper, OtherRapid, NoMajor };
+}
+variable RHRatio {
+  type discrete [ 3 ] = { MoistMDryL, DryMMoistL, Other };
+}
+variable SfcWndShfDis {
+  type discrete [ 7 ] = { DenvCyclone, E_W_N, E_W_S, MovingFtorOt, DryLine, None, Other };
+}
+variable SynForcng {
+  type discrete [ 5 ] = { SigNegative, NegToPos, SigPositive, PosToNeg, LittleChange };
+}
+variable TempDis {
+  type discrete [ 4 ] = { QStationary, Moving, None, Other };
+}
+variable WindAloft {
+  type discrete [ 4 ] = { LV, SWQuad, NWQuad, AllElse };
+}
+variable WindFieldMt {
+  type discrete [ 2 ] = { Westerly, LVorOther };
+}
+variable WindFieldPln {
+  type discrete [ 6 ] = { LV, DenvCyclone, LongAnticyc, E_NE, SEQuad, WidespdDnsl };
+}
+probability ( MvmtFeatures | Scenario ) {
+  (A) 0.21, 0.48, 0.13, 0.18;
+  (B) 0.48, 0.15, 0.19, 0.18;
+  (C) 0.42, 0.09, 0.03, 0.46;
+  (D) 0.23, 0.07, 0.27, 0.43;
+  (E) 0.03, 0.22, 0.40, 0.35;
+  (F) 0.21, 0.02, 0.23, 0.54;
+  (G) 0.07, 0.55, 0.19, 0.19;
+  (H) 0.23, 0.15, 0.10, 0.52;
+  (I) 0.02, 0.41, 0.14, 0.43;
+  (J) 0.56, 0.29, 0.09, 0.06;
+  (K) 0.30, 0.13, 0.08, 0.49;
+};
+probability ( AMDewptCalPl ) {
+  table 0.67, 0.07, 0.26;
+};
+probability ( MorningBound ) {
+  table 0.17, 0.16, 0.67;
+};
+probability ( MidLLapse | Scenario ) {
+  (A) 0.16, 0.65, 0.19;
+  (B) 0.36, 0.05, 0.59;
+  (C) 0.13, 0.26, 0.61;
+  (D) 0.30, 0.30, 0.40;
+  (E) 0.66, 0.33, 0.01;
+  (F) 0.24, 0.13, 0.63;
+  (G) 0.25, 0.04, 0.71;
+  (H) 0.49, 0.14, 0.37;
+  (I) 0.26, 0.20, 0.54;
+  (J) 0.37, 0.22, 0.41;
+  (K) 0.03, 0.20, 0.77;
+};
+probability ( InsSclInScen | AMInsWliScen, InsChange ) {
+  (LessUnstable, Decreasing) 0.19, 0.33, 0.48;
+  (LessUnstable, LittleChange) 0.18, 0.49, 0.33;
+  (LessUnstable, Increasing) 0.40, 0.14, 0.46;
+  (Average, Decreasing) 0.36, 0.37, 0.27;
+  (Average, LittleChange) 0.69, 0.18, 0.13;
+  (Average, Increasing) 0.05, 0.74, 0.21;
+  (MoreUnstable, Decreasing) 0.48, 0.08, 0.44;
+  (MoreUnstable, LittleChange) 0.17, 0.31, 0.52;
+  (MoreUnstable, Increasing) 0.10, 0.30, 0.60;
+};
+probability ( CapInScen | AMCINInScen, CapChange ) {
+  (LessThanAve, Decreasing) 0.11, 0.41, 0.48;
+  (LessThanAve, LittleChange) 0.30, 0.65, 0.05;
+  (LessThanAve, Increasing) 0.40, 0.36, 0.24;
+  (Average, Decreasing) 0.22, 0.37, 0.41;
+  (Average, LittleChange) 0.04, 0.83, 0.13;
+  (Average, Increasing) 0.01, 0.30, 0.69;
+  (MoreThanAve, Decreasing) 0.41, 0.18, 0.41;
+  (MoreThanAve, LittleChange) 0.24, 0.75, 0.01;
+  (MoreThanAve, Increasing) 0.44, 0.35, 0.21;
+};
+probability ( LoLevMoistAd ) {
+  table 0.26, 0.03, 0.27, 0.44;
+};
+probability ( CapChange | CompPlFcst ) {
+  (IncCapDecIns) 0.11, 0.88, 0.01;
+  (LittleChange) 0.22, 0.22, 0.56;
+  (DecCapIncIns) 0.01, 0.23, 0.76;
+};
+probability ( CldShadeOth | AreaMoDryAir, AreaMeso_ALS, CombClouds ) {
+  (VeryWet, StrongUp, Cloudy) 0.04, 0.89, 0.07;
+  (VeryWet, StrongUp, PC) 0.28, 0.69, 0.03;
+  (VeryWet, StrongUp, Clear) 0.43, 0.48, 0.09;
+  (VeryWet, WeakUp, Cloudy) 0.37, 0.60, 0.03;
+  (VeryWet, WeakUp, PC) 0.37, 0.48, 0.15;
+  (VeryWet, WeakUp, Clear) 0.19, 0.44, 0.37;
+  (VeryWet, Neutral, Cloudy) 0.26, 0.32, 0.42;
+  (VeryWet, Neutral, PC) 0.66, 0.20, 0.14;
+  (VeryWet, Neutral, Clear) 0.23, 0.51, 0.26;
+  (VeryWet, Down, Cloudy) 0.33, 0.67, 0.00;
+  (VeryWet, Down, PC) 0.46, 0.53, 0.01;
+  (VeryWet, Down, Clear) 0.05, 0.22, 0.73;
+  (Wet, StrongUp, Cloudy) 0.74, 0.21, 0.05;
+  (Wet, StrongUp, PC) 0.14, 0.68, 0.18;
+  (Wet, StrongUp, Clear) 0.20, 0.04, 0.76;
+  (Wet, WeakUp, Cloudy) 0.56, 0.40, 0.04;
+  (Wet, WeakUp, PC) 0.88, 0.07, 0.05;
+  (Wet, WeakUp, Clear) 0.04, 0.44, 0.52;
+  (Wet, Neutral, Cloudy) 0.34, 0.57, 0.09;
+  (Wet, Neutral, PC) 0.16, 0.49, 0.35;
+  (Wet, Neutral, Clear) 0.07, 0.62, 0.31;
+  (Wet, Down, Cloudy) 0.06, 0.06, 0.88;
+  (Wet, Down, PC) 0.15, 0.02, 0.83;
+  (Wet, Down, Clear) 0.67, 0.22, 0.11;
+  (Neutral, StrongUp, Cloudy) 0.10, 0.26, 0.64;
+  (Neutral, StrongUp, PC) 0.47, 0.28, 0.25;
+  (Neutral, StrongUp, Clear) 0.07, 0.45, 0.48;
+  (Neutral, WeakUp, Cloudy) 0.67, 0.04, 0.29;
+  (Neutral, WeakUp, PC) 0.04, 0.00, 0.96;
+  (Neutral, WeakUp, Clear) 0.15, 0.25, 0.60;
+  (Neutral, Neutral, Cloudy) 0.09, 0.86, 0.05;
+  (Neutral, Neutral, PC) 0.06, 0.19, 0.75;
+  (Neutral, Neutral, Clear) 0.34, 0.63, 0.03;
+  (Neutral, Down, Cloudy) 0.47, 0.16, 0.37;
+  (Neutral, Down, PC) 0.26, 0.32, 0.42;
+  (Neutral, Down, Clear) 0.10, 0.87, 0.03;
+  (Dry, StrongUp, Cloudy) 0.29, 0.05, 0.66;
+  (Dry, StrongUp, PC) 0.03, 0.76, 0.21;
+  (Dry, StrongUp, Clear) 0.70, 0.25, 0.05;
+  (Dry, WeakUp, Cloudy) 0.64, 0.25, 0.11;
+  (Dry, WeakUp, PC) 0.07, 0.65, 0.28;
+  (Dry, WeakUp, Clear) 0.38, 0.05, 0.57;
+  (Dry, Neutral, Cloudy) 0.12, 0.51, 0.37;
+  (Dry, Neutral, PC) 0.78, 0.21, 0.01;
+  (Dry, Neutral, Clear) 0.35, 0.53, 0.12;
+  (Dry, Down, Cloudy) 0.09, 0.50, 0.41;
+  (Dry, Down, PC) 0.18, 0.51, 0.31;
+  (Dry, Down, Clear) 0.17, 0.13, 0.70;
+};
+probability ( QGVertMotion ) {
+  table 0.06, 0.49, 0.45, 0.00;
+};
+probability ( AMCINInScen | ScenRelAMCIN, MorningCIN ) {
+  (AB, None) 0.54, 0.27, 0.19;
+  (AB, PartInhibit) 0.46, 0.29, 0.25;
+  (AB, Stifling) 0.26, 0.12, 0.62;
+  (AB, TotalInhibit) 0.68, 0.26, 0.06;
+  (CThruK, None) 0.01, 0.45, 0.54;
+  (CThruK, PartInhibit) 0.63, 0.27, 0.10;
+  (CThruK, Stifling) 0.59, 0.05, 0.36;
+  (CThruK, TotalInhibit) 0.42, 0.11, 0.47;
+};
+probability ( MorningCIN ) {
+  table 0.20, 0.15, 0.62, 0.03;
+};
+probability ( Date ) {
+  table 0.10, 0.05, 0.19, 0.02, 0.57, 0.07;
+};
+probability ( CldShadeConv | InsInMt, WndHodograph ) {
+  (None, DCVZFavor) 0.35, 0.57, 0.08;
+  (None, StrongWest) 0.14, 0.71, 0.15;
+  (None, Westerly) 0.29, 0.31, 0.40;
+  (None, Other) 0.70, 0.04, 0.26;
+  (Weak, DCVZFavor) 0.48, 0.32, 0.20;
+  (Weak, StrongWest) 0.14, 0.23, 0.63;
+  (Weak, Westerly) 0.29, 0.48, 0.23;
+  (Weak, Other) 0.12, 0.53, 0.35;
+  (Strong, DCVZFavor) 0.22, 0.17, 0.61;
+  (Strong, StrongWest) 0.90, 0.04, 0.06;
+  (Strong, Westerly) 0.05, 0.04, 0.91;
+  (Strong, Other) 0.10, 0.80, 0.10;
+};
+probability ( AMInstabMt ) {
+  table 0.45, 0.53, 0.02;
+};
+probability ( AreaMoDryAir | AreaMeso_ALS, CombMoisture ) {
+  (StrongUp, VeryWet) 0.22, 0.63, 0.05, 0.10;
+  (StrongUp, Wet) 0.45, 0.05, 0.16, 0.34;
+  (StrongUp, Neutral) 0.31, 0.47, 0.19, 0.03;
+  (StrongUp, Dry) 0.00, 0.22, 0.55, 0.23;
+  (WeakUp, VeryWet) 0.39, 0.41, 0.14, 0.06;
+  (WeakUp, Wet) 0.50, 0.02, 0.11, 0.37;
+  (WeakUp, Neutral) 0.21, 0.02, 0.65, 0.12;
+  (WeakUp, Dry) 0.46, 0.45, 0.08, 0.01;
+  (Neutral, VeryWet) 0.29, 0.28, 0.01, 0.42;
+  (Neutral, Wet) 0.34, 0.03, 0.28, 0.35;
+  (Neutral, Neutral) 0.03, 0.53, 0.31, 0.13;
+  (Neutral, Dry) 0.18, 0.16, 0.15, 0.51;
+  (Down, VeryWet) 0.62, 0.06, 0.03, 0.29;
+  (Down, Wet) 0.21, 0.61, 0.01, 0.17;
+  (Down, Neutral) 0.55, 0.20, 0.11, 0.14;
+  (Down, Dry) 0.07, 0.05, 0.87, 0.01;
+};
+probability ( Dewpoints | Scenario ) {
+  (A) 0.15, 0.01, 0.23, 0.39, 0.12, 0.06, 0.04;
+  (B) 0.23, 0.15, 0.29, 0.07, 0.08, 0.16, 0.02;
+  (C) 0.10, 0.04, 0.06, 0.12, 0.41, 0.25, 0.02;
+  (D) 0.10, 0.02, 0.19, 0.15, 0.18, 0.01, 0.35;
+  (E) 0.13, 0.22, 0.09, 0.00, 0.11, 0.25, 0.20;
+  (F) 0.00, 0.40, 0.08, 0.14, 0.14, 0.15, 0.09;
+  (G) 0.06, 0.41, 0.02, 0.05, 0.19, 0.17, 0.10;
+  (H) 0.33, 0.21, 0.01, 0.01, 0.26, 0.05, 0.13;
+  (I) 0.13, 0.10, 0.13, 0.20, 0.15, 0.19, 0.10;
+  (J) 0.27, 0.11, 0.01, 0.29, 0.06, 0.18, 0.08;
+  (K) 0.08, 0.29, 0.45, 0.01, 0.06, 0.02, 0.09;
+};
+probability ( PlainsFcst | CurPropConv, InsSclInScen, CapInScen, ScnRelPlFcst ) {
+  (None, LessUnstable, LessThanAve, A) 0.34, 0.15, 0.51;
+  (None, LessUnstable, LessThanAve, B) 0.29, 0.46, 0.25;
+  (None, LessUnstable, LessThanAve, C) 0.81, 0.08, 0.11;
+  (None, LessUnstable, LessThanAve, D) 0.43, 0.13, 0.44;
+  (None, LessUnstable, LessThanAve, E) 0.20, 0.69, 0.11;
+  (None, LessUnstable, LessThanAve, F) 0.39, 0.53, 0.08;
+  (None, LessUnstable, LessThanAve, G) 0.11, 0.14, 0.75;
+  (None, LessUnstable, LessThanAve, H) 0.70, 0.30, 0.00;
+  (None, LessUnstable, LessThanAve, I) 0.24, 0.69, 0.07;
+  (None, LessUnstable, LessThanAve, J) 0.18, 0.67, 0.15;
+  (None, LessUnstable, LessThanAve, K) 0.38, 0.13, 0.49;
+  (None, LessUnstable, Average, A) 0.23, 0.03, 0.74;
+  (None, LessUnstable, Average, B) 0.28, 0.39, 0.33;
+  (None, LessUnstable, Average, C) 0.08, 0.42, 0.50;
+  (None, LessUnstable, Average, D) 0.11, 0.61, 0.28;
+  (None, LessUnstable, Average, E) 0.45, 0.31, 0.24;
+  (None, LessUnstable, Average, F) 0.71, 0.25, 0.04;
+  (None, LessUnstable, Average, G) 0.08, 0.51, 0.41;
+  (None, LessUnstable, Average, H) 0.41, 0.41, 0.18;
+  (None, LessUnstable, Average, I) 0.63, 0.24, 0.13;
+  (None, LessUnstable, Average, J) 0.45, 0.10, 0.45;
+  (None, LessUnstable, Average, K) 0.35, 0.23, 0.42;
+  (None, LessUnstable, MoreThanAve, A) 0.10, 0.01, 0.89;
+  (None, LessUnstable, MoreThanAve, B) 0.04, 0.24, 0.72;
+  (None, LessUnstable, MoreThanAve, C) 0.30, 0.49, 0.21;
+  (None, LessUnstable, MoreThanAve, D) 0.30, 0.28, 0.42;
+  (None, LessUnstable, MoreThanAve, E) 0.01, 0.81, 0.18;
+  (None, LessUnstable, MoreThanAve, F) 0.11, 0.85, 0.04;
+  (None, LessUnstable, MoreThanAve, G) 0.41, 0.48, 0.11;
+  (None, LessUnstable, MoreThanAve, H) 0.93, 0.05, 0.02;
+  (None, LessUnstable, MoreThanAve, I) 0.47, 0.26, 0.27;
+  (None, LessUnstable, MoreThanAve, J) 0.12, 0.23, 0.65;
+  (None, LessUnstable, MoreThanAve, K) 0.06, 0.44, 0.50;
+  (None, Average, LessThanAve, A) 0.63, 0.15, 0.22;
+  (None, Average, LessThanAve, B) 0.07, 0.25, 0.68;
+  (None, Average, LessThanAve, C) 0.22, 0.26, 0.52;
+  (None, Average, LessThanAve, D) 0.14, 0.48, 0.38;
+  (None, Average, LessThanAve, E) 0.14, 0.55, 0.31;
+  (None, Average, LessThanAve, F) 0.17, 0.52, 0.31;
+  (None, Average, LessThanAve, G) 0.33, 0.18, 0.49;
+  (None, Average, LessThanAve, H) 0.20, 0.75, 0.05;
+  (None, Average, LessThanAve, I) 0.43, 0.27, 0.30;
+  (None, Average, LessThanAve, J) 0.71, 0.08, 0.21;
+  (None, Average, LessThanAve, K) 0.19, 0.32, 0.49;
+  (None, Average, Average, A) 0.43, 0.12, 0.45;
+  (None, Average, Average, B) 0.22, 0.52, 0.26;
+  (None, Average, Average, C) 0.24, 0.76, 0.00;
+  (None, Average, Average, D) 0.34, 0.65, 0.01;
+  (None, Average, Average, E) 0.48, 0.27, 0.25;
+  (None, Average, Average, F) 0.57, 0.04, 0.39;
+  (None, Average, Average, G) 0.03, 0.54, 0.43;
+  (None, Average, Average, H) 0.05, 0.44, 0.51;
+  (None, Average, Average, I) 0.46, 0.47, 0.07;
+  (None, Average, Average, J) 0.04, 0.95, 0.01;
+  (None, Average, Average, K) 0.49, 0.04, 0.47;
+  (None, Average, MoreThanAve, A) 0.40, 0.38, 0.22;
+  (None, Average, MoreThanAve, B) 0.71, 0.08, 0.21;
+  (None, Average, MoreThanAve, C) 0.36, 0.40, 0.24;
+  (None, Average, MoreThanAve, D) 0.30, 0.45, 0.25;
+  (None, Average, MoreThanAve, E) 0.50, 0.27, 0.23;
+  (None, Average, MoreThanAve, F) 0.88, 0.05, 0.07;
+  (None, Average, MoreThanAve, G) 0.70, 0.07, 0.23;
+  (None, Average, MoreThanAve, H) 0.27, 0.57, 0.16;
+  (None, Average, MoreThanAve, I) 0.48, 0.17, 0.35;
+  (None, Average, MoreThanAve, J) 0.49, 0.32, 0.19;
+  (None, Average, MoreThanAve, K) 0.02, 0.28, 0.70;
+  (None, MoreUnstable, LessThanAve, A) 0.19, 0.41, 0.40;
+  (None, MoreUnstable, LessThanAve, B) 0.07, 0.69, 0.24;
+  (None, MoreUnstable, LessThanAve, C) 0.42, 0.55, 0.03;
+  (None, MoreUnstable, LessThanAve, D) 0.37, 0.29, 0.34;
+  (None, MoreUnstable, LessThanAve, E) 0.02, 0.90, 0.08;
+  (None, MoreUnstable, LessThanAve, F) 0.64, 0.18, 0.18;
+  (None, MoreUnstable, LessThanAve, G) 0.06, 0.07, 0.87;
+  (None, MoreUnstable, LessThanAve, H) 0.12, 0.75, 0.13;
+  (None, MoreUnstable, LessThanAve, I) 0.36, 0.10, 0.54;
+  (None, MoreUnstable, LessThanAve, J) 0.36, 0.38, 0.26;
+  (None, MoreUnstable, LessThanAve, K) 0.18, 0.25, 0.57;
+  (None, MoreUnstable, Average, A) 0.04, 0.45, 0.51;
+  (None, MoreUnstable, Average, B) 0.36, 0.55, 0.09;
+  (None, MoreUnstable, Average, C) 0.19, 0.70, 0.11;
+  (None, MoreUnstable, Average, D) 0.48, 0.46, 0.06;
+  (None, MoreUnstable, Average, E) 0.30, 0.55, 0.15;
+  (None, MoreUnstable, Average, F) 0.29, 0.40, 0.31;
+  (None, MoreUnstable, Average, G) 0.11, 0.49, 0.40;
+  (None, MoreUnstable, Average, H) 0.06, 0.56, 0.38;
+  (None, MoreUnstable, Average, I) 0.29, 0.71, 0.00;
+  (None, MoreUnstable, Average, J) 0.19, 0.81, 0.00;
+  (None, MoreUnstable, Average, K) 0.49, 0.19, 0.32;
+  (None, MoreUnstable, MoreThanAve, A) 0.35, 0.30, 0.35;
+  (None, MoreUnstable, MoreThanAve, B) 0.00, 0.28, 0.72;
+  (None, MoreUnstable, MoreThanAve, C) 0.56, 0.15, 0.29;
+  (None, MoreUnstable, MoreThanAve, D) 0.40, 0.49, 0.11;
+  (None, MoreUnstable, MoreThanAve, E) 0.38, 0.51, 0.11;
+  (None, MoreUnstable, MoreThanAve, F) 0.26, 0.50, 0.24;
+  (None, MoreUnstable, MoreThanAve, G) 0.37, 0.19, 0.44;
+  (None, MoreUnstable, MoreThanAve, H) 0.17, 0.52, 0.31;
+  (None, MoreUnstable, MoreThanAve, I) 0.22, 0.39, 0.39;
+  (None, MoreUnstable, MoreThanAve, J) 0.31, 0.58, 0.11;
+  (None, MoreUnstable, MoreThanAve, K) 0.87, 0.03, 0.10;
+  (Slight, LessUnstable, LessThanAve, A) 0.34, 0.11, 0.55;
+  (Slight, LessUnstable, LessThanAve, B) 0.43, 0.42, 0.15;
+  (Slight, LessUnstable, LessThanAve, C) 0.25, 0.69, 0.06;
+  (Slight, LessUnstable, LessThanAve, D) 0.80, 0.19, 0.01;
+  (Slight, LessUnstable, LessThanAve, E) 0.09, 0.49, 0.42;
+  (Slight, LessUnstable, LessThanAve, F) 0.02, 0.91, 0.07;
+  (Slight, LessUnstable, LessThanAve, G) 0.22, 0.13, 0.65;
+  (Slight, LessUnstable, LessThanAve, H) 0.12, 0.66, 0.22;
+  (Slight, LessUnstable, LessThanAve, I) 0.03, 0.24, 0.73;
+  (Slight, LessUnstable, LessThanAve, J) 0.73, 0.12, 0.15;
+  (Slight, LessUnstable, LessThanAve, K) 0.27, 0.59, 0.14;
+  (Slight, LessUnstable, Average, A) 0.24, 0.39, 0.37;
+  (Slight, LessUnstable, Average, B) 0.49, 0.06, 0.45;
+  (Slight, LessUnstable, Average, C) 0.51, 0.29, 0.20;
+  (Slight, LessUnstable, Average, D) 0.27, 0.55, 0.18;
+  (Slight, LessUnstable, Average, E) 0.12, 0.28, 0.60;
+  (Slight, LessUnstable, Average, F) 0.43, 0.26, 0.31;
+  (Slight, LessUnstable, Average, G) 0.01, 0.28, 0.71;
+  (Slight, LessUnstable, Average, H) 0.06, 0.20, 0.74;
+  (Slight, LessUnstable, Average, I) 0.72, 0.19, 0.09;
+  (Slight, LessUnstable, Average, J) 0.44, 0.22, 0.34;
+  (Slight, LessUnstable, Average, K) 0.80, 0.15, 0.05;
+  (Slight, LessUnstable, MoreThanAve, A) 0.83, 0.03, 0.14;
+  (Slight, LessUnstable, MoreThanAve, B) 0.07, 0.45, 0.48;
+  (Slight, LessUnstable, MoreThanAve, C) 0.83, 0.09, 0.08;
+  (Slight, LessUnstable, MoreThanAve, D) 0.31, 0.30, 0.39;
+  (Slight, LessUnstable, MoreThanAve, E) 0.49, 0.15, 0.36;
+  (Slight, LessUnstable, MoreThanAve, F) 0.71, 0.03, 0.26;
+  (Slight, LessUnstable, MoreThanAve, G) 0.12, 0.30, 0.58;
+  (Slight, LessUnstable, MoreThanAve, H) 0.34, 0.09, 0.57;
+  (Slight, LessUnstable, MoreThanAve, I) 0.63, 0.13, 0.24;
+  (Slight, LessUnstable, MoreThanAve, J) 0.17, 0.82, 0.01;
+  (Slight, LessUnstable, MoreThanAve, K) 0.44, 0.08, 0.48;
+  (Slight, Average, LessThanAve, A) 0.53, 0.23, 0.24;
+  (Slight, Average, LessThanAve, B) 0.42, 0.18, 0.40;
+  (Slight, Average, LessThanAve, C) 0.03, 0.56, 0.41;
+  (Slight, Average, LessThanAve, D) 0.12, 0.32, 0.56;
+  (Slight, Average, LessThanAve, E) 0.08, 0.29, 0.63;
+  (Slight, Average, LessThanAve, F) 0.01, 0.70, 0.29;
+  (Slight, Average, LessThanAve, G) 0.23, 0.27, 0.50;
+  (Slight, Average, LessThanAve, H) 0.23, 0.73, 0.04;
+  (Slight, Average, LessThanAve, I) 0.09, 0.84, 0.07;
+  (Slight, Average, LessThanAve, J) 0.36, 0.62, 0.02;
+  (Slight, Average, LessThanAve, K) 0.31, 0.37, 0.32;
+  (Slight, Average, Average, A) 0.29, 0.21, 0.50;
+  (Slight, Average, Average, B) 0.78, 0.06, 0.16;
+  (Slight, Average, Average, C) 0.79, 0.20, 0.01;
+  (Slight, Average, Average, D) 0.66, 0.16, 0.18;
+  (Slight, Average, Average, E) 0.06, 0.53, 0.41;
+  (Slight, Average, Average, F) 0.17, 0.74, 0.09;
+  (Slight, Average, Average, G) 0.01, 0.09, 0.90;
+  (Slight, Average, Average, H) 0.30, 0.46, 0.24;
+  (Slight, Average, Average, I) 0.13, 0.80, 0.07;
+  (Slight, Average, Average, J) 0.54, 0.16, 0.30;
+  (Slight, Average, Average, K) 0.42, 0.38, 0.20;
+  (Slight, Average, MoreThanAve, A) 0.10, 0.24, 0.66;
+  (Slight, Average, MoreThanAve, B) 0.29, 0.04, 0.67;
+  (Slight, Average, MoreThanAve, C) 0.01, 0.50, 0.49;
+  (Slight, Average, MoreThanAve, D) 0.42, 0.02, 0.56;
+  (Slight, Average, MoreThanAve, E) 0.10, 0.38, 0.52;
+  (Slight, Average, MoreThanAve, F) 0.10, 0.86, 0.04;
+  (Slight, Average, MoreThanAve, G) 0.70, 0.27, 0.03;
+  (Slight, Average, MoreThanAve, H) 0.20, 0.77, 0.03;
+  (Slight, Average, MoreThanAve, I) 0.35, 0.07, 0.58;
+  (Slight, Average, MoreThanAve, J) 0.52, 0.12, 0.36;
+  (Slight, Average, MoreThanAve, K) 0.47, 0.51, 0.02;
+  (Slight, MoreUnstable, LessThanAve, A) 0.26, 0.66, 0.08;
+  (Slight, MoreUnstable, LessThanAve, B) 0.21, 0.79, 0.00;
+  (Slight, MoreUnstable, LessThanAve, C) 0.15, 0.65, 0.20;
+  (Slight, MoreUnstable, LessThanAve, D) 0.22, 0.13, 0.65;
+  (Slight, MoreUnstable, LessThanAve, E) 0.04, 0.09, 0.87;
+  (Slight, MoreUnstable, LessThanAve, F) 0.47, 0.27, 0.26;
+  (Slight, MoreUnstable, LessThanAve, G) 0.04, 0.16, 0.80;
+  (Slight, MoreUnstable, LessThanAve, H) 0.76, 0.22, 0.02;
+  (Slight, MoreUnstable, LessThanAve, I) 0.13, 0.70, 0.17;
+  (Slight, MoreUnstable, LessThanAve, J) 0.34, 0.25, 0.41;
+  (Slight, MoreUnstable, LessThanAve, K) 0.56, 0.40, 0.04;
+  (Slight, MoreUnstable, Average, A) 0.49, 0.36, 0.15;
+  (Slight, MoreUnstable, Average, B) 0.03, 0.14, 0.83;
+  (Slight, MoreUnstable, Average, C) 0.22, 0.60, 0.18;
+  (Slight, MoreUnstable, Average, D) 0.20, 0.19, 0.61;
+  (Slight, MoreUnstable, Average, E) 0.01, 0.74, 0.25;
+  (Slight, MoreUnstable, Average, F) 0.60, 0.20, 0.20;
+  (Slight, MoreUnstable, Average, G) 0.29, 0.39, 0.32;
+  (Slight, MoreUnstable, Average, H) 0.62, 0.05, 0.33;
+  (Slight, MoreUnstable, Average, I) 0.02, 0.14, 0.84;
+  (Slight, MoreUnstable, Average, J) 0.40, 0.22, 0.38;
+  (Slight, MoreUnstable, Average, K) 0.51, 0.10, 0.39;
+  (Slight, MoreUnstable, MoreThanAve, A) 0.33, 0.49, 0.18;
+  (Slight, MoreUnstable, MoreThanAve, B) 0.41, 0.12, 0.47;
+  (Slight, MoreUnstable, MoreThanAve, C) 0.39, 0.32, 0.29;
+  (Slight, MoreUnstable, MoreThanAve, D) 0.03, 0.63, 0.34;
+  (Slight, MoreUnstable, MoreThanAve, E) 0.00, 0.91, 0.09;
+  (Slight, MoreUnstable, MoreThanAve, F) 0.16, 0.42, 0.42;
+  (Slight, MoreUnstable, MoreThanAve, G) 0.11, 0.85, 0.04;
+  (Slight, MoreUnstable, MoreThanAve, H) 0.20, 0.38, 0.42;
+  (Slight, MoreUnstable, MoreThanAve, I) 0.62, 0.23, 0.15;
+  (Slight, MoreUnstable, MoreThanAve, J) 0.05, 0.38, 0.57;
+  (Slight, MoreUnstable, MoreThanAve, K) 0.05, 0.43, 0.52;
+  (Moderate, LessUnstable, LessThanAve, A) 0.82, 0.07, 0.11;
+  (Moderate, LessUnstable, LessThanAve, B) 0.53, 0.11, 0.36;
+  (Moderate, LessUnstable, LessThanAve, C) 0.20, 0.46, 0.34;
+  (Moderate, LessUnstable, LessThanAve, D) 0.05, 0.43, 0.52;
+  (Moderate, LessUnstable, LessThanAve, E) 0.18, 0.57, 0.25;
+  (Moderate, LessUnstable, LessThanAve, F) 0.10, 0.02, 0.88;
+  (Moderate, LessUnstable, LessThanAve, G) 0.64, 0.21, 0.15;
+  (Moderate, LessUnstable, LessThanAve, H) 0.47, 0.35, 0.18;
+  (Moderate, LessUnstable, LessThanAve, I) 0.29, 0.41, 0.30;
+  (Moderate, LessUnstable, LessThanAve, J) 0.08, 0.66, 0.26;
+  (Moderate, LessUnstable, LessThanAve, K) 0.89, 0.09, 0.02;
+  (Moderate, LessUnstable, Average, A) 0.20, 0.14, 0.66;
+  (Moderate, LessUnstable, Average, B) 0.14, 0.47, 0.39;
+  (Moderate, LessUnstable, Average, C) 0.37, 0.21, 0.42;
+  (Moderate, LessUnstable, Average, D) 0.06, 0.18, 0.76;
+  (Moderate, LessUnstable, Average, E) 0.72, 0.19, 0.09;
+  (Moderate, LessUnstable, Average, F) 0.68, 0.07, 0.25;
+  (Moderate, LessUnstable, Average, G) 0.49, 0.45, 0.06;
+  (Moderate, LessUnstable, Average, H) 0.12, 0.41, 0.47;
+  (Moderate, LessUnstable, Average, I) 0.12, 0.25, 0.63;
+  (Moderate, LessUnstable, Average, J) 0.31, 0.11, 0.58;
+  (Moderate, LessUnstable, Average, K) 0.48, 0.06, 0.46;
+  (Moderate, LessUnstable, MoreThanAve, A) 0.57, 0.26, 0.17;
+  (Moderate, LessUnstable, MoreThanAve, B) 0.40, 0.58, 0.02;
+  (Moderate, LessUnstable, MoreThanAve, C) 0.41, 0.09, 0.50;
+  (Moderate, LessUnstable, MoreThanAve, D) 0.30, 0.31, 0.39;
+  (Moderate, LessUnstable, MoreThanAve, E) 0.25, 0.30, 0.45;
+  (Moderate, LessUnstable, MoreThanAve, F) 0.43, 0.43, 0.14;
+  (Moderate, LessUnstable, MoreThanAve, G) 0.15, 0.67, 0.18;
+  (Moderate, LessUnstable, MoreThanAve, H) 0.83, 0.05, 0.12;
+  (Moderate, LessUnstable, MoreThanAve, I) 0.80, 0.13, 0.07;
+  (Moderate, LessUnstable, MoreThanAve, J) 0.19, 0.69, 0.12;
+  (Moderate, LessUnstable, MoreThanAve, K) 0.02, 0.64, 0.34;
+  (Moderate, Average, LessThanAve, A) 0.34, 0.08, 0.58;
+  (Moderate, Average, LessThanAve, B) 0.66, 0.02, 0.32;
+  (Moderate, Average, LessThanAve, C) 0.31, 0.55, 0.14;
+  (Moderate, Average, LessThanAve, D) 0.78, 0.03, 0.19;
+  (Moderate, Average, LessThanAve, E) 0.94, 0.04, 0.02;
+  (Moderate, Average, LessThanAve, F) 0.47, 0.27, 0.26;
+  (Moderate, Average, LessThanAve, G) 0.17, 0.30, 0.53;
+  (Moderate, Average, LessThanAve, H) 0.51, 0.08, 0.41;
+  (Moderate, Average, LessThanAve, I) 0.14, 0.29, 0.57;
+  (Moderate, Average, LessThanAve, J) 0.18, 0.28, 0.54;
+  (Moderate, Average, LessThanAve, K) 0.72, 0.22, 0.06;
+  (Moderate, Average, Average, A) 0.08, 0.05, 0.87;
+  (Moderate, Average, Average, B) 0.50, 0.29, 0.21;
+  (Moderate, Average, Average, C) 0.68, 0.25, 0.07;
+  (Moderate, Average, Average, D) 0.73, 0.04, 0.23;
+  (Moderate, Average, Average, E) 0.47, 0.07, 0.46;
+  (Moderate, Average, Average, F) 0.29, 0.02, 0.69;
+  (Moderate, Average, Average, G) 0.05, 0.79, 0.16;
+  (Moderate, Average, Average, H) 0.61, 0.22, 0.17;
+  (Moderate, Average, Average, I) 0.33, 0.62, 0.05;
+  (Moderate, Average, Average, J) 0.12, 0.61, 0.27;
+  (Moderate, Average, Average, K) 0.25, 0.27, 0.48;
+  (Moderate, Average, MoreThanAve, A) 0.32, 0.07, 0.61;
+  (Moderate, Average, MoreThanAve, B) 0.05, 0.87, 0.08;
+  (Moderate, Average, MoreThanAve, C) 0.28, 0.45, 0.27;
+  (Moderate, Average, MoreThanAve, D) 0.25, 0.74, 0.01;
+  (Moderate, Average, MoreThanAve, E) 0.69, 0.01, 0.30;
+  (Moderate, Average, MoreThanAve, F) 0.54, 0.27, 0.19;
+  (Moderate, Average, MoreThanAve, G) 0.72, 0.04, 0.24;
+  (Moderate, Average, MoreThanAve, H) 0.46, 0.00, 0.54;
+  (Moderate, Average, MoreThanAve, I) 0.19, 0.36, 0.45;
+  (Moderate, Average, MoreThanAve, J) 0.64, 0.23, 0.13;
+  (Moderate, Average, MoreThanAve, K) 0.58, 0.13, 0.29;
+  (Moderate, MoreUnstable, LessThanAve, A) 0.20, 0.01, 0.79;
+  (Moderate, MoreUnstable, LessThanAve, B) 0.14, 0.30, 0.56;
+  (Moderate, MoreUnstable, LessThanAve, C) 0.20, 0.58, 0.22;
+  (Moderate, MoreUnstable, LessThanAve, D) 0.27, 0.41, 0.32;
+  (Moderate, MoreUnstable, LessThanAve, E) 0.02, 0.93, 0.05;
+  (Moderate, MoreUnstable, LessThanAve, F) 0.72, 0.13, 0.15;
+  (Moderate, MoreUnstable, LessThanAve, G) 0.12, 0.45, 0.43;
+  (Moderate, MoreUnstable, LessThanAve, H) 0.93, 0.05, 0.02;
+  (Moderate, MoreUnstable, LessThanAve, I) 0.45, 0.28, 0.27;
+  (Moderate, MoreUnstable, LessThanAve, J) 0.54, 0.26, 0.20;
+  (Moderate, MoreUnstable, LessThanAve, K) 0.08, 0.06, 0.86;
+  (Moderate, MoreUnstable, Average, A) 0.06, 0.62, 0.32;
+  (Moderate, MoreUnstable, Average, B) 0.16, 0.79, 0.05;
+  (Moderate, MoreUnstable, Average, C) 0.36, 0.19, 0.45;
+  (Moderate, MoreUnstable, Average, D) 0.23, 0.31, 0.46;
+  (Moderate, MoreUnstable, Average, E) 0.73, 0.10, 0.17;
+  (Moderate, MoreUnstable, Average, F) 0.62, 0.16, 0.22;
+  (Moderate, MoreUnstable, Average, G) 0.29, 0.30, 0.41;
+  (Moderate, MoreUnstable, Average, H) 0.39, 0.42, 0.19;
+  (Moderate, MoreUnstable, Average, I) 0.31, 0.21, 0.48;
+  (Moderate, MoreUnstable, Average, J) 0.05, 0.48, 0.47;
+  (Moderate, MoreUnstable, Average, K) 0.21, 0.04, 0.75;
+  (Moderate, MoreUnstable, MoreThanAve, A) 0.25, 0.58, 0.17;
+  (Moderate, MoreUnstable, MoreThanAve, B) 0.09, 0.66, 0.25;
+  (Moderate, MoreUnstable, MoreThanAve, C) 0.51, 0.13, 0.36;
+  (Moderate, MoreUnstable, MoreThanAve, D) 0.16, 0.15, 0.69;
+  (Moderate, MoreUnstable, MoreThanAve, E) 0.40, 0.46, 0.14;
+  (Moderate, MoreUnstable, MoreThanAve, F) 0.63, 0.29, 0.08;
+  (Moderate, MoreUnstable, MoreThanAve, G) 0.32, 0.57, 0.11;
+  (Moderate, MoreUnstable, MoreThanAve, H) 0.39, 0.47, 0.14;
+  (Moderate, MoreUnstable, MoreThanAve, I) 0.35, 0.28, 0.37;
+  (Moderate, MoreUnstable, MoreThanAve, J) 0.07, 0.27, 0.66;
+  (Moderate, MoreUnstable, MoreThanAve, K) 0.08, 0.01, 0.91;
+  (Strong, LessUnstable, LessThanAve, A) 0.09, 0.27, 0.64;
+  (Strong, LessUnstable, LessThanAve, B) 0.13, 0.34, 0.53;
+  (Strong, LessUnstable, LessThanAve, C) 0.15, 0.74, 0.11;
+  (Strong, LessUnstable, LessThanAve, D) 0.60, 0.10, 0.30;
+  (Strong, LessUnstable, LessThanAve, E) 0.01, 0.51, 0.48;
+  (Strong, LessUnstable, LessThanAve, F) 0.54, 0.25, 0.21;
+  (Strong, LessUnstable, LessThanAve, G) 0.05, 0.65, 0.30;
+  (Strong, LessUnstable, LessThanAve, H) 0.33, 0.01, 0.66;
+  (Strong, LessUnstable, LessThanAve, I) 0.24, 0.47, 0.29;
+  (Strong, LessUnstable, LessThanAve, J) 0.02, 0.28, 0.70;
+  (Strong, LessUnstable, LessThanAve, K) 0.65, 0.17, 0.18;
+  (Strong, LessUnstable, Average, A) 0.31, 0.08, 0.61;
+  (Strong, LessUnstable, Average, B) 0.05, 0.75, 0.20;
+  (Strong, LessUnstable, Average, C) 0.10, 0.15, 0.75;
+  (Strong, LessUnstable, Average, D) 0.08, 0.15, 0.77;
+  (Strong, LessUnstable, Average, E) 0.06, 0.63, 0.31;
+  (Strong, LessUnstable, Average, F) 0.36, 0.27, 0.37;
+  (Strong, LessUnstable, Average, G) 0.73, 0.22, 0.05;
+  (Strong, LessUnstable, Average, H) 0.57, 0.02, 0.41;
+  (Strong, LessUnstable, Average, I) 0.41, 0.01, 0.58;
+  (Strong, LessUnstable, Average, J) 0.11, 0.83, 0.06;
+  (Strong, LessUnstable, Average, K) 0.13, 0.58, 0.29;
+  (Strong, LessUnstable, MoreThanAve, A) 0.51, 0.48, 0.01;
+  (Strong, LessUnstable, MoreThanAve, B) 0.21, 0.39, 0.40;
+  (Strong, LessUnstable, MoreThanAve, C) 0.05, 0.68, 0.27;
+  (Strong, LessUnstable, MoreThanAve, D) 0.72, 0.10, 0.18;
+  (Strong, LessUnstable, MoreThanAve, E) 0.30, 0.46, 0.24;
+  (Strong, LessUnstable, MoreThanAve, F) 0.19, 0.76, 0.05;
+  (Strong, LessUnstable, MoreThanAve, G) 0.23, 0.34, 0.43;
+  (Strong, LessUnstable, MoreThanAve, H) 0.24, 0.40, 0.36;
+  (Strong, LessUnstable, MoreThanAve, I) 0.23, 0.33, 0.44;
+  (Strong, LessUnstable, MoreThanAve, J) 0.80, 0.01, 0.19;
+  (Strong, LessUnstable, MoreThanAve, K) 0.71, 0.21, 0.08;
+  (Strong, Average, LessThanAve, A) 0.02, 0.68, 0.30;
+  (Strong, Average, LessThanAve, B) 0.87, 0.03, 0.10;
+  (Strong, Average, LessThanAve, C) 0.15, 0.67, 0.18;
+  (Strong, Average, LessThanAve, D) 0.35, 0.35, 0.30;
+  (Strong, Average, LessThanAve, E) 0.01, 0.64, 0.35;
+  (Strong, Average, LessThanAve, F) 0.05, 0.11, 0.84;
+  (Strong, Average, LessThanAve, G) 0.08, 0.57, 0.35;
+  (Strong, Average, LessThanAve, H) 0.68, 0.27, 0.05;
+  (Strong, Average, LessThanAve, I) 0.06, 0.77, 0.17;
+  (Strong, Average, LessThanAve, J) 0.42, 0.16, 0.42;
+  (Strong, Average, LessThanAve, K) 0.34, 0.18, 0.48;
+  (Strong, Average, Average, A) 0.09, 0.78, 0.13;
+  (Strong, Average, Average, B) 0.26, 0.22, 0.52;
+  (Strong, Average, Average, C) 0.20, 0.75, 0.05;
+  (Strong, Average, Average, D) 0.15, 0.68, 0.17;
+  (Strong, Average, Average, E) 0.34, 0.62, 0.04;
+  (Strong, Average, Average, F) 0.16, 0.79, 0.05;
+  (Strong, Average, Average, G) 0.75, 0.12, 0.13;
+  (Strong, Average, Average, H) 0.16, 0.53, 0.31;
+  (Strong, Average, Average, I) 0.01, 0.81, 0.18;
+  (Strong, Average, Average, J) 0.74, 0.12, 0.14;
+  (Strong, Average, Average, K) 0.02, 0.01, 0.97;
+  (Strong, Average, MoreThanAve, A) 0.15, 0.13, 0.72;
+  (Strong, Average, MoreThanAve, B) 0.26, 0.34, 0.40;
+  (Strong, Average, MoreThanAve, C) 0.66, 0.22, 0.12;
+  (Strong, Average, MoreThanAve, D) 0.64, 0.19, 0.17;
+  (Strong, Average, MoreThanAve, E) 0.97, 0.00, 0.03;
+  (Strong, Average, MoreThanAve, F) 0.15, 0.15, 0.70;
+  (Strong, Average, MoreThanAve, G) 0.03, 0.11, 0.86;
+  (Strong, Average, MoreThanAve, H) 0.55, 0.01, 0.44;
+  (Strong, Average, MoreThanAve, I) 0.29, 0.41, 0.30;
+  (Strong, Average, MoreThanAve, J) 0.59, 0.01, 0.40;
+  (Strong, Average, MoreThanAve, K) 0.37, 0.18, 0.45;
+  (Strong, MoreUnstable, LessThanAve, A) 0.87, 0.02, 0.11;
+  (Strong, MoreUnstable, LessThanAve, B) 0.28, 0.58, 0.14;
+  (Strong, MoreUnstable, LessThanAve, C) 0.59, 0.26, 0.15;
+  (Strong, MoreUnstable, LessThanAve, D) 0.60, 0.05, 0.35;
+  (Strong, MoreUnstable, LessThanAve, E) 0.43, 0.07, 0.50;
+  (Strong, MoreUnstable, LessThanAve, F) 0.73, 0.20, 0.07;
+  (Strong, MoreUnstable, LessThanAve, G) 0.53, 0.43, 0.04;
+  (Strong, MoreUnstable, LessThanAve, H) 0.34, 0.40, 0.26;
+  (Strong, MoreUnstable, LessThanAve, I) 0.15, 0.44, 0.41;
+  (Strong, MoreUnstable, LessThanAve, J) 0.17, 0.15, 0.68;
+  (Strong, MoreUnstable, LessThanAve, K) 0.50, 0.34, 0.16;
+  (Strong, MoreUnstable, Average, A) 0.22, 0.40, 0.38;
+  (Strong, MoreUnstable, Average, B) 0.60, 0.39, 0.01;
+  (Strong, MoreUnstable, Average, C) 0.08, 0.88, 0.04;
+  (Strong, MoreUnstable, Average, D) 0.02, 0.92, 0.06;
+  (Strong, MoreUnstable, Average, E) 0.03, 0.33, 0.64;
+  (Strong, MoreUnstable, Average, F) 0.34, 0.26, 0.40;
+  (Strong, MoreUnstable, Average, G) 0.46, 0.40, 0.14;
+  (Strong, MoreUnstable, Average, H) 0.04, 0.59, 0.37;
+  (Strong, MoreUnstable, Average, I) 0.38, 0.21, 0.41;
+  (Strong, MoreUnstable, Average, J) 0.06, 0.64, 0.30;
+  (Strong, MoreUnstable, Average, K) 0.09, 0.50, 0.41;
+  (Strong, MoreUnstable, MoreThanAve, A) 0.07, 0.33, 0.60;
+  (Strong, MoreUnstable, MoreThanAve, B) 0.24, 0.45, 0.31;
+  (Strong, MoreUnstable, MoreThanAve, C) 0.31, 0.13, 0.56;
+  (Strong, MoreUnstable, MoreThanAve, D) 0.26, 0.04, 0.70;
+  (Strong, MoreUnstable, MoreThanAve, E) 0.54, 0.43, 0.03;
+  (Strong, MoreUnstable, MoreThanAve, F) 0.11, 0.53, 0.36;
+  (Strong, MoreUnstable, MoreThanAve, G) 0.06, 0.17, 0.77;
+  (Strong, MoreUnstable, MoreThanAve, H) 0.27, 0.39, 0.34;
+  (Strong, MoreUnstable, MoreThanAve, I) 0.63, 0.27, 0.10;
+  (Strong, MoreUnstable, MoreThanAve, J) 0.04, 0.27, 0.69;
+  (Strong, MoreUnstable, MoreThanAve, K) 0.90, 0.01, 0.09;
+};
+probability ( LLIW ) {
+  table 0.14, 0.20, 0.36, 0.30;
+};
+probability ( InsChange | LoLevMoistAd, CompPlFcst ) {
+  (StrongPos, IncCapDecIns) 0.20, 0.03, 0.77;
+  (StrongPos, LittleChange) 0.43, 0.00, 0.57;
+  (StrongPos, DecCapIncIns) 0.37, 0.24, 0.39;
+  (WeakPos, IncCapDecIns) 0.07, 0.33, 0.60;
+  (WeakPos, LittleChange) 0.85, 0.05, 0.10;
+  (WeakPos, DecCapIncIns) 0.08, 0.67, 0.25;
+  (Neutral, IncCapDecIns) 0.19, 0.28, 0.53;
+  (Neutral, LittleChange) 0.62, 0.12, 0.26;
+  (Neutral, DecCapIncIns) 0.09, 0.01, 0.90;
+  (Negative, IncCapDecIns) 0.19, 0.46, 0.35;
+  (Negative, LittleChange) 0.80, 0.09, 0.11;
+  (Negative, DecCapIncIns) 0.05, 0.61, 0.34;
+};
+probability ( IRCloudCover ) {
+  table 0.00, 0.41, 0.59;
+};
+probability ( SfcWndShfDis | Scenario ) {
+  (A) 0.05, 0.05, 0.09, 0.02, 0.16, 0.34, 0.29;
+  (B) 0.21, 0.14, 0.20, 0.16, 0.05, 0.15, 0.09;
+  (C) 0.05, 0.03, 0.16, 0.32, 0.01, 0.28, 0.15;
+  (D) 0.04, 0.33, 0.02, 0.08, 0.21, 0.26, 0.06;
+  (E) 0.15, 0.19, 0.15, 0.27, 0.11, 0.05, 0.08;
+  (F) 0.07, 0.10, 0.12, 0.20, 0.15, 0.26, 0.10;
+  (G) 0.53, 0.21, 0.03, 0.05, 0.02, 0.11, 0.05;
+  (H) 0.02, 0.31, 0.01, 0.08, 0.01, 0.54, 0.03;
+  (I) 0.03, 0.01, 0.02, 0.13, 0.17, 0.09, 0.55;
+  (J) 0.22, 0.40, 0.13, 0.05, 0.04, 0.14, 0.02;
+  (K) 0.20, 0.03, 0.04, 0.24, 0.21, 0.12, 0.16;
+};
+probability ( LatestCIN ) {
+  table 0.09, 0.18, 0.24, 0.49;
+};
+probability ( CompPlFcst | Boundaries, CldShadeConv, AreaMeso_ALS, CldShadeOth ) {
+  (None, None, StrongUp, Cloudy) 0.27, 0.72, 0.01;
+  (None, None, StrongUp, PC) 0.04, 0.11, 0.85;
+  (None, None, StrongUp, Clear) 0.02, 0.51, 0.47;
+  (None, None, WeakUp, Cloudy) 0.12, 0.45, 0.43;
+  (None, None, WeakUp, PC) 0.10, 0.04, 0.86;
+  (None, None, WeakUp, Clear) 0.65, 0.20, 0.15;
+  (None, None, Neutral, Cloudy) 0.29, 0.33, 0.38;
+  (None, None, Neutral, PC) 0.03, 0.02, 0.95;
+  (None, None, Neutral, Clear) 0.20, 0.76, 0.04;
+  (None, None, Down, Cloudy) 0.00, 0.82, 0.18;
+  (None, None, Down, PC) 0.01, 0.33, 0.66;
+  (None, None, Down, Clear) 0.10, 0.47, 0.43;
+  (None, Some, StrongUp, Cloudy) 0.13, 0.61, 0.26;
+  (None, Some, StrongUp, PC) 0.27, 0.35, 0.38;
+  (None, Some, StrongUp, Clear) 0.06, 0.04, 0.90;
+  (None, Some, WeakUp, Cloudy) 0.16, 0.42, 0.42;
+  (None, Some, WeakUp, PC) 0.22, 0.54, 0.24;
+  (None, Some, WeakUp, Clear) 0.07, 0.89, 0.04;
+  (None, Some, Neutral, Cloudy) 0.01, 0.65, 0.34;
+  (None, Some, Neutral, PC) 0.57, 0.22, 0.21;
+  (None, Some, Neutral, Clear) 0.49, 0.14, 0.37;
+  (None, Some, Down, Cloudy) 0.33, 0.45, 0.22;
+  (None, Some, Down, PC) 0.14, 0.20, 0.66;
+  (None, Some, Down, Clear) 0.13, 0.86, 0.01;
+  (None, Marked, StrongUp, Cloudy) 0.70, 0.13, 0.17;
+  (None, Marked, StrongUp, PC) 0.70, 0.05, 0.25;
+  (None, Marked, StrongUp, Clear) 0.31, 0.33, 0.36;
+  (None, Marked, WeakUp, Cloudy) 0.76, 0.12, 0.12;
+  (None, Marked, WeakUp, PC) 0.36, 0.18, 0.46;
+  (None, Marked, WeakUp, Clear) 0.62, 0.15, 0.23;
+  (None, Marked, Neutral, Cloudy) 0.28, 0.18, 0.54;
+  (None, Marked, Neutral, PC) 0.30, 0.12, 0.58;
+  (None, Marked, Neutral, Clear) 0.66, 0.23, 0.11;
+  (None, Marked, Down, Cloudy) 0.41, 0.47, 0.12;
+  (None, Marked, Down, PC) 0.20, 0.32, 0.48;
+  (None, Marked, Down, Clear) 0.37, 0.05, 0.58;
+  (Weak, None, StrongUp, Cloudy) 0.78, 0.02, 0.20;
+  (Weak, None, StrongUp, PC) 0.22, 0.46, 0.32;
+  (Weak, None, StrongUp, Clear) 0.00, 0.81, 0.19;
+  (Weak, None, WeakUp, Cloudy) 0.22, 0.37, 0.41;
+  (Weak, None, WeakUp, PC) 0.43, 0.56, 0.01;
+  (Weak, None, WeakUp, Clear) 0.05, 0.31, 0.64;
+  (Weak, None, Neutral, Cloudy) 0.03, 0.32, 0.65;
+  (Weak, None, Neutral, PC) 0.51, 0.39, 0.10;
+  (Weak, None, Neutral, Clear) 0.11, 0.70, 0.19;
+  (Weak, None, Down, Cloudy) 0.54, 0.33, 0.13;
+  (Weak, None, Down, PC) 0.34, 0.29, 0.37;
+  (Weak, None, Down, Clear) 0.69, 0.26, 0.05;
+  (Weak, Some, StrongUp, Cloudy) 0.01, 0.95, 0.04;
+  (Weak, Some, StrongUp, PC) 0.46, 0.40, 0.14;
+  (Weak, Some, StrongUp, Clear) 0.38, 0.48, 0.14;
+  (Weak, Some, WeakUp, Cloudy) 0.48, 0.35, 0.17;
+  (Weak, Some, WeakUp, PC) 0.21, 0.12, 0.67;
+  (Weak, Some, WeakUp, Clear) 0.28, 0.53, 0.19;
+  (Weak, Some, Neutral, Cloudy) 0.17, 0.47, 0.36;
+  (Weak, Some, Neutral, PC) 0.13, 0.47, 0.40;
+  (Weak, Some, Neutral, Clear) 0.66, 0.20, 0.14;
+  (Weak, Some, Down, Cloudy) 0.84, 0.03, 0.13;
+  (Weak, Some, Down, PC) 0.15, 0.21, 0.64;
+  (Weak, Some, Down, Clear) 0.59, 0.13, 0.28;
+  (Weak, Marked, StrongUp, Cloudy) 0.37, 0.24, 0.39;
+  (Weak, Marked, StrongUp, PC) 0.74, 0.15, 0.11;
+  (Weak, Marked, StrongUp, Clear) 0.15, 0.76, 0.09;
+  (Weak, Marked, WeakUp, Cloudy) 0.39, 0.01, 0.60;
+  (Weak, Marked, WeakUp, PC) 0.53, 0.04, 0.43;
+  (Weak, Marked, WeakUp, Clear) 0.17, 0.66, 0.17;
+  (Weak, Marked, Neutral, Cloudy) 0.38, 0.09, 0.53;
+  (Weak, Marked, Neutral, PC) 0.65, 0.15, 0.20;
+  (Weak, Marked, Neutral, Clear) 0.21, 0.38, 0.41;
+  (Weak, Marked, Down, Cloudy) 0.23, 0.54, 0.23;
+  (Weak, Marked, Down, PC) 0.74, 0.00, 0.26;
+  (Weak, Marked, Down, Clear) 0.20, 0.77, 0.03;
+  (Strong, None, StrongUp, Cloudy) 0.55, 0.31, 0.14;
+  (Strong, None, StrongUp, PC) 0.15, 0.25, 0.60;
+  (Strong, None, StrongUp, Clear) 0.13, 0.32, 0.55;
+  (Strong, None, WeakUp, Cloudy) 0.04, 0.91, 0.05;
+  (Strong, None, WeakUp, PC) 0.28, 0.34, 0.38;
+  (Strong, None, WeakUp, Clear) 0.72, 0.01, 0.27;
+  (Strong, None, Neutral, Cloudy) 0.17, 0.29, 0.54;
+  (Strong, None, Neutral, PC) 0.31, 0.68, 0.01;
+  (Strong, None, Neutral, Clear) 0.64, 0.25, 0.11;
+  (Strong, None, Down, Cloudy) 0.57, 0.07, 0.36;
+  (Strong, None, Down, PC) 0.13, 0.60, 0.27;
+  (Strong, None, Down, Clear) 0.35, 0.26, 0.39;
+  (Strong, Some, StrongUp, Cloudy) 0.09, 0.23, 0.68;
+  (Strong, Some, StrongUp, PC) 0.13, 0.40, 0.47;
+  (Strong, Some, StrongUp, Clear) 0.62, 0.28, 0.10;
+  (Strong, Some, WeakUp, Cloudy) 0.54, 0.42, 0.04;
+  (Strong, Some, WeakUp, PC) 0.54, 0.06, 0.40;
+  (Strong, Some, WeakUp, Clear) 0.29, 0.09, 0.62;
+  (Strong, Some, Neutral, Cloudy) 0.05, 0.53, 0.42;
+  (Strong, Some, Neutral, PC) 0.11, 0.86, 0.03;
+  (Strong, Some, Neutral, Clear) 0.04, 0.14, 0.82;
+  (Strong, Some, Down, Cloudy) 0.05, 0.60, 0.35;
+  (Strong, Some, Down, PC) 0.19, 0.37, 0.44;
+  (Strong, Some, Down, Clear) 0.01, 0.41, 0.58;
+  (Strong, Marked, StrongUp, Cloudy) 0.60, 0.35, 0.05;
+  (Strong, Marked, StrongUp, PC) 0.83, 0.10, 0.07;
+  (Strong, Marked, StrongUp, Clear) 0.47, 0.47, 0.06;
+  (Strong, Marked, WeakUp, Cloudy) 0.57, 0.08, 0.35;
+  (Strong, Marked, WeakUp, PC) 0.65, 0.31, 0.04;
+  (Strong, Marked, WeakUp, Clear) 0.03, 0.30, 0.67;
+  (Strong, Marked, Neutral, Cloudy) 0.30, 0.52, 0.18;
+  (Strong, Marked, Neutral, PC) 0.40, 0.06, 0.54;
+  (Strong, Marked, Neutral, Clear) 0.53, 0.18, 0.29;
+  (Strong, Marked, Down, Cloudy) 0.22, 0.32, 0.46;
+  (Strong, Marked, Down, PC) 0.32, 0.66, 0.02;
+  (Strong, Marked, Down, Clear) 0.09, 0.42, 0.49;
+};
+probability ( N0_7muVerMo ) {
+  table 0.01, 0.42, 0.50, 0.07;
+};
+probability ( RHRatio | Scenario ) {
+  (A) 0.44, 0.25, 0.31;
+  (B) 0.33, 0.37, 0.30;
+  (C) 0.32, 0.67, 0.01;
+  (D) 0.62, 0.12, 0.26;
+  (E) 0.04, 0.71, 0.25;
+  (F) 0.47, 0.05, 0.48;
+  (G) 0.27, 0.58, 0.15;
+  (H) 0.39, 0.14, 0.47;
+  (I) 0.18, 0.17, 0.65;
+  (J) 0.09, 0.20, 0.71;
+  (K) 0.01, 0.67, 0.32;
+};
+probability ( ScenRelAMIns | Scenario ) {
+  (A) 0.10, 0.01, 0.27, 0.24, 0.18, 0.20;
+  (B) 0.29, 0.02, 0.31, 0.24, 0.11, 0.03;
+  (C) 0.03, 0.04, 0.07, 0.17, 0.10, 0.59;
+  (D) 0.18, 0.26, 0.16, 0.33, 0.05, 0.02;
+  (E) 0.02, 0.29, 0.09, 0.32, 0.06, 0.22;
+  (F) 0.12, 0.03, 0.07, 0.63, 0.02, 0.13;
+  (G) 0.16, 0.56, 0.04, 0.07, 0.05, 0.12;
+  (H) 0.39, 0.01, 0.02, 0.29, 0.17, 0.12;
+  (I) 0.12, 0.04, 0.33, 0.16, 0.07, 0.28;
+  (J) 0.20, 0.24, 0.12, 0.26, 0.14, 0.04;
+  (K) 0.33, 0.10, 0.24, 0.02, 0.25, 0.06;
+};
+probability ( ScenRelAMCIN | Scenario ) {
+  (A) 0.16, 0.84;
+  (B) 0.93, 0.07;
+  (C) 0.98, 0.02;
+  (D) 0.45, 0.55;
+  (E) 0.27, 0.73;
+  (F) 0.15, 0.85;
+  (G) 0.32, 0.68;
+  (H) 0.62, 0.38;
+  (I) 0.05, 0.95;
+  (J) 0.26, 0.74;
+  (K) 0.61, 0.39;
+};
+probability ( Boundaries | OutflowFrMt, WndHodograph, MorningBound ) {
+  (None, DCVZFavor, None) 0.57, 0.19, 0.24;
+  (None, DCVZFavor, Weak) 0.07, 0.48, 0.45;
+  (None, DCVZFavor, Strong) 0.00, 0.84, 0.16;
+  (None, StrongWest, None) 0.30, 0.47, 0.23;
+  (None, StrongWest, Weak) 0.44, 0.43, 0.13;
+  (None, StrongWest, Strong) 0.55, 0.39, 0.06;
+  (None, Westerly, None) 0.65, 0.18, 0.17;
+  (None, Westerly, Weak) 0.53, 0.33, 0.14;
+  (None, Westerly, Strong) 0.03, 0.20, 0.77;
+  (None, Other, None) 0.14, 0.74, 0.12;
+  (None, Other, Weak) 0.65, 0.02, 0.33;
+  (None, Other, Strong) 0.82, 0.01, 0.17;
+  (Weak, DCVZFavor, None) 0.53, 0.04, 0.43;
+  (Weak, DCVZFavor, Weak) 0.04, 0.73, 0.23;
+  (Weak, DCVZFavor, Strong) 0.03, 0.00, 0.97;
+  (Weak, StrongWest, None) 0.60, 0.01, 0.39;
+  (Weak, StrongWest, Weak) 0.29, 0.48, 0.23;
+  (Weak, StrongWest, Strong) 0.20, 0.19, 0.61;
+  (Weak, Westerly, None) 0.66, 0.03, 0.31;
+  (Weak, Westerly, Weak) 0.19, 0.36, 0.45;
+  (Weak, Westerly, Strong) 0.43, 0.44, 0.13;
+  (Weak, Other, None) 0.31, 0.38, 0.31;
+  (Weak, Other, Weak) 0.01, 0.20, 0.79;
+  (Weak, Other, Strong) 0.56, 0.32, 0.12;
+  (Strong, DCVZFavor, None) 0.78, 0.15, 0.07;
+  (Strong, DCVZFavor, Weak) 0.19, 0.64, 0.17;
+  (Strong, DCVZFavor, Strong) 0.64, 0.29, 0.07;
+  (Strong, StrongWest, None) 0.11, 0.02, 0.87;
+  (Strong, StrongWest, Weak) 0.12, 0.34, 0.54;
+  (Strong, StrongWest, Strong) 0.14, 0.17, 0.69;
+  (Strong, Westerly, None) 0.41, 0.51, 0.08;
+  (Strong, Westerly, Weak) 0.24, 0.66, 0.10;
+  (Strong, Westerly, Strong) 0.55, 0.13, 0.32;
+  (Strong, Other, None) 0.90, 0.07, 0.03;
+  (Strong, Other, Weak) 0.01, 0.17, 0.82;
+  (Strong, Other, Strong) 0.02, 0.81, 0.17;
+};
+probability ( InsInMt | CldShadeOth, AMInstabMt ) {
+  (Cloudy, None) 0.21, 0.28, 0.51;
+  (Cloudy, Weak) 0.04, 0.17, 0.79;
+  (Cloudy, Strong) 0.24, 0.58, 0.18;
+  (PC, None) 0.44, 0.55, 0.01;
+  (PC, Weak) 0.13, 0.53, 0.34;
+  (PC, Strong) 0.43, 0.11, 0.46;
+  (Clear, None) 0.49, 0.20, 0.31;
+  (Clear, Weak) 0.22, 0.70, 0.08;
+  (Clear, Strong) 0.36, 0.34, 0.30;
+};
+probability ( RaoContMoist ) {
+  table 0.27, 0.00, 0.16, 0.57;
+};
+probability ( AreaMeso_ALS | CombVerMo ) {
+  (StrongUp) 0.09, 0.07, 0.58, 0.26;
+  (WeakUp) 0.36, 0.07, 0.11, 0.46;
+  (Neutral) 0.32, 0.32, 0.16, 0.20;
+  (Down) 0.11, 0.53, 0.26, 0.10;
+};
+probability ( SubjVertMo ) {
+  table 0.05, 0.23, 0.11, 0.61;
+};
+probability ( WindFieldPln | Scenario ) {
+  (A) 0.01, 0.20, 0.44, 0.18, 0.11, 0.06;
+  (B) 0.01, 0.35, 0.50, 0.02, 0.05, 0.07;
+  (C) 0.27, 0.05, 0.03, 0.18, 0.19, 0.28;
+  (D) 0.24, 0.28, 0.08, 0.29, 0.08, 0.03;
+  (E) 0.21, 0.51, 0.02, 0.07, 0.05, 0.14;
+  (F) 0.06, 0.09, 0.63, 0.06, 0.13, 0.03;
+  (G) 0.26, 0.18, 0.01, 0.39, 0.11, 0.05;
+  (H) 0.09, 0.01, 0.14, 0.01, 0.72, 0.03;
+  (I) 0.20, 0.05, 0.14, 0.45, 0.16, 0.00;
+  (J) 0.02, 0.06, 0.23, 0.23, 0.27, 0.19;
+  (K) 0.33, 0.01, 0.13, 0.23, 0.25, 0.05;
+};
+probability ( CurPropConv | LatestCIN, LLIW ) {
+  (None, Unfavorable) 0.66, 0.01, 0.27, 0.06;
+  (None, Weak) 0.17, 0.46, 0.13, 0.24;
+  (None, Moderate) 0.25, 0.28, 0.32, 0.15;
+  (None, Strong) 0.20, 0.07, 0.32, 0.41;
+  (PartInhibit, Unfavorable) 0.10, 0.08, 0.40, 0.42;
+  (PartInhibit, Weak) 0.13, 0.30, 0.00, 0.57;
+  (PartInhibit, Moderate) 0.43, 0.12, 0.12, 0.33;
+  (PartInhibit, Strong) 0.09, 0.15, 0.56, 0.20;
+  (Stifling, Unfavorable) 0.32, 0.21, 0.26, 0.21;
+  (Stifling, Weak) 0.16, 0.51, 0.06, 0.27;
+  (Stifling, Moderate) 0.54, 0.30, 0.01, 0.15;
+  (Stifling, Strong) 0.14, 0.36, 0.42, 0.08;
+  (TotalInhibit, Unfavorable) 0.49, 0.32, 0.06, 0.13;
+  (TotalInhibit, Weak) 0.17, 0.11, 0.41, 0.31;
+  (TotalInhibit, Moderate) 0.13, 0.81, 0.06, 0.00;
+  (TotalInhibit, Strong) 0.02, 0.00, 0.54, 0.44;
+};
+probability ( TempDis | Scenario ) {
+  (A) 0.41, 0.39, 0.05, 0.15;
+  (B) 0.11, 0.07, 0.43, 0.39;
+  (C) 0.28, 0.56, 0.03, 0.13;
+  (D) 0.45, 0.00, 0.25, 0.30;
+  (E) 0.20, 0.58, 0.03, 0.19;
+  (F) 0.12, 0.07, 0.13, 0.68;
+  (G) 0.53, 0.10, 0.16, 0.21;
+  (H) 0.03, 0.37, 0.09, 0.51;
+  (I) 0.12, 0.22, 0.33, 0.33;
+  (J) 0.30, 0.02, 0.01, 0.67;
+  (K) 0.08, 0.38, 0.32, 0.22;
+};
+probability ( SynForcng | Scenario ) {
+  (A) 0.21, 0.12, 0.50, 0.09, 0.08;
+  (B) 0.59, 0.01, 0.12, 0.26, 0.02;
+  (C) 0.38, 0.45, 0.02, 0.07, 0.08;
+  (D) 0.33, 0.10, 0.03, 0.41, 0.13;
+  (E) 0.01, 0.38, 0.24, 0.27, 0.10;
+  (F) 0.08, 0.60, 0.01, 0.06, 0.25;
+  (G) 0.11, 0.12, 0.40, 0.22, 0.15;
+  (H) 0.06, 0.38, 0.00, 0.08, 0.48;
+  (I) 0.11, 0.25, 0.10, 0.31, 0.23;
+  (J) 0.29, 0.02, 0.12, 0.05, 0.52;
+  (K) 0.06, 0.03, 0.28, 0.06, 0.57;
+};
+probability ( MeanRH | Scenario ) {
+  (A) 0.13, 0.70, 0.17;
+  (B) 0.51, 0.06, 0.43;
+  (C) 0.31, 0.21, 0.48;
+  (D) 0.76, 0.20, 0.04;
+  (E) 0.11, 0.15, 0.74;
+  (F) 0.28, 0.59, 0.13;
+  (G) 0.53, 0.18, 0.29;
+  (H) 0.38, 0.38, 0.24;
+  (I) 0.15, 0.46, 0.39;
+  (J) 0.15, 0.38, 0.47;
+  (K) 0.20, 0.54, 0.26;
+};
+probability ( LowLLapse | Scenario ) {
+  (A) 0.02, 0.40, 0.42, 0.16;
+  (B) 0.19, 0.40, 0.05, 0.36;
+  (C) 0.48, 0.13, 0.26, 0.13;
+  (D) 0.73, 0.17, 0.03, 0.07;
+  (E) 0.56, 0.14, 0.26, 0.04;
+  (F) 0.26, 0.11, 0.38, 0.25;
+  (G) 0.01, 0.45, 0.42, 0.12;
+  (H) 0.18, 0.66, 0.05, 0.11;
+  (I) 0.57, 0.02, 0.10, 0.31;
+  (J) 0.35, 0.20, 0.40, 0.05;
+  (K) 0.02, 0.73, 0.05, 0.20;
+};
+probability ( WndHodograph ) {
+  table 0.31, 0.57, 0.01, 0.11;
+};
+probability ( CombMoisture | SatContMoist, RaoContMoist ) {
+  (VeryWet, VeryWet) 0.46, 0.16, 0.12, 0.26;
+  (VeryWet, Wet) 0.60, 0.29, 0.10, 0.01;
+  (VeryWet, Neutral) 0.78, 0.02, 0.12, 0.08;
+  (VeryWet, Dry) 0.14, 0.13, 0.12, 0.61;
+  (Wet, VeryWet) 0.21, 0.26, 0.26, 0.27;
+  (Wet, Wet) 0.30, 0.37, 0.33, 0.00;
+  (Wet, Neutral) 0.31, 0.29, 0.35, 0.05;
+  (Wet, Dry) 0.61, 0.15, 0.01, 0.23;
+  (Neutral, VeryWet) 0.21, 0.61, 0.07, 0.11;
+  (Neutral, Wet) 0.01, 0.95, 0.02, 0.02;
+  (Neutral, Neutral) 0.34, 0.30, 0.09, 0.27;
+  (Neutral, Dry) 0.17, 0.11, 0.57, 0.15;
+  (Dry, VeryWet) 0.07, 0.78, 0.01, 0.14;
+  (Dry, Wet) 0.11, 0.10, 0.39, 0.40;
+  (Dry, Neutral) 0.47, 0.04, 0.08, 0.41;
+  (Dry, Dry) 0.11, 0.02, 0.21, 0.66;
+};
+probability ( LIfr12ZDENSd ) {
+  table 0.13, 0.69, 0.11, 0.07;
+};
+probability ( Scenario | Date ) {
+  (May15_Jun14) 0.02, 0.12, 0.09, 0.07, 0.01, 0.23, 0.02, 0.13, 0.09, 0.07, 0.15;
+  (Jun15_Jul1) 0.10, 0.04, 0.07, 0.06, 0.07, 0.05, 0.01, 0.28, 0.00, 0.26, 0.06;
+  (Jul2_Jul15) 0.18, 0.29, 0.03, 0.01, 0.01, 0.02, 0.04, 0.01, 0.38, 0.00, 0.03;
+  (Jul16_Aug10) 0.03, 0.04, 0.15, 0.19, 0.09, 0.24, 0.12, 0.05, 0.03, 0.05, 0.01;
+  (Aug11_Aug20) 0.11, 0.15, 0.03, 0.32, 0.02, 0.08, 0.03, 0.03, 0.07, 0.14, 0.02;
+  (Aug20_Sep15) 0.13, 0.05, 0.11, 0.07, 0.01, 0.05, 0.31, 0.04, 0.07, 0.15, 0.01;
+};
+probability ( N34StarFcst | ScenRel3_4, PlainsFcst ) {
+  (ACEFK, XNIL) 0.21, 0.51, 0.28;
+  (ACEFK, SIG) 0.16, 0.14, 0.70;
+  (ACEFK, SVR) 0.79, 0.08, 0.13;
+  (B, XNIL) 0.56, 0.18, 0.26;
+  (B, SIG) 0.28, 0.31, 0.41;
+  (B, SVR) 0.66, 0.05, 0.29;
+  (D, XNIL) 0.16, 0.16, 0.68;
+  (D, SIG) 0.38, 0.01, 0.61;
+  (D, SVR) 0.58, 0.23, 0.19;
+  (GJ, XNIL) 0.06, 0.51, 0.43;
+  (GJ, SIG) 0.48, 0.16, 0.36;
+  (GJ, SVR) 0.37, 0.61, 0.02;
+  (HI, XNIL) 0.44, 0.07, 0.49;
+  (HI, SIG) 0.03, 0.63, 0.34;
+  (HI, SVR) 0.75, 0.20, 0.05;
+};
+probability ( SatContMoist ) {
+  table 0.00, 0.68, 0.28, 0.04;
+};
+probability ( WindFieldMt | Scenario ) {
+  (A) 0.64, 0.36;
+  (B) 0.73, 0.27;
+  (C) 0.28, 0.72;
+  (D) 0.41, 0.59;
+  (E) 0.72, 0.28;
+  (F) 0.46, 0.54;
+  (G) 0.83, 0.17;
+  (H) 0.03, 0.97;
+  (I) 0.77, 0.23;
+  (J) 0.98, 0.02;
+  (K) 0.96, 0.04;
+};
+probability ( ScnRelPlFcst | Scenario ) {
+  (A) 0.05, 0.12, 0.04, 0.06, 0.06, 0.30, 0.21, 0.00, 0.07, 0.04, 0.05;
+  (B) 0.02, 0.05, 0.39, 0.12, 0.15, 0.01, 0.01, 0.00, 0.02, 0.19, 0.04;
+  (C) 0.17, 0.13, 0.07, 0.07, 0.12, 0.11, 0.05, 0.20, 0.01, 0.05, 0.02;
+  (D) 0.04, 0.11, 0.15, 0.05, 0.08, 0.03, 0.22, 0.00, 0.09, 0.01, 0.22;
+  (E) 0.17, 0.09, 0.04, 0.01, 0.03, 0.08, 0.07, 0.11, 0.16, 0.12, 0.12;
+  (F) 0.10, 0.02, 0.03, 0.17, 0.18, 0.05, 0.04, 0.03, 0.28, 0.05, 0.05;
+  (G) 0.07, 0.01, 0.02, 0.05, 0.07, 0.06, 0.04, 0.16, 0.24, 0.23, 0.05;
+  (H) 0.11, 0.00, 0.14, 0.07, 0.01, 0.00, 0.01, 0.43, 0.12, 0.04, 0.07;
+  (I) 0.07, 0.15, 0.05, 0.38, 0.13, 0.04, 0.00, 0.02, 0.11, 0.00, 0.05;
+  (J) 0.33, 0.00, 0.22, 0.06, 0.04, 0.01, 0.01, 0.01, 0.29, 0.02, 0.01;
+  (K) 0.03, 0.00, 0.03, 0.41, 0.10, 0.05, 0.03, 0.03, 0.04, 0.05, 0.23;
+};
+probability ( AMInsWliScen | ScenRelAMIns, LIfr12ZDENSd, AMDewptCalPl ) {
+  (ABI, LIGt0, Instability) 0.20, 0.39, 0.41;
+  (ABI, LIGt0, Neutral) 0.24, 0.30, 0.46;
+  (ABI, LIGt0, Stability) 0.16, 0.82, 0.02;
+  (ABI, N1GtLIGt_4, Instability) 0.28, 0.21, 0.51;
+  (ABI, N1GtLIGt_4, Neutral) 0.50, 0.34, 0.16;
+  (ABI, N1GtLIGt_4, Stability) 0.33, 0.44, 0.23;
+  (ABI, N5GtLIGt_8, Instability) 0.04, 0.60, 0.36;
+  (ABI, N5GtLIGt_8, Neutral) 0.07, 0.76, 0.17;
+  (ABI, N5GtLIGt_8, Stability) 0.26, 0.29, 0.45;
+  (ABI, LILt_8, Instability) 0.33, 0.59, 0.08;
+  (ABI, LILt_8, Neutral) 0.35, 0.46, 0.19;
+  (ABI, LILt_8, Stability) 0.14, 0.71, 0.15;
+  (CDEJ, LIGt0, Instability) 0.78, 0.20, 0.02;
+  (CDEJ, LIGt0, Neutral) 0.16, 0.78, 0.06;
+  (CDEJ, LIGt0, Stability) 0.06, 0.67, 0.27;
+  (CDEJ, N1GtLIGt_4, Instability) 0.65, 0.05, 0.30;
+  (CDEJ, N1GtLIGt_4, Neutral) 0.35, 0.30, 0.35;
+  (CDEJ, N1GtLIGt_4, Stability) 0.10, 0.22, 0.68;
+  (CDEJ, N5GtLIGt_8, Instability) 0.25, 0.10, 0.65;
+  (CDEJ, N5GtLIGt_8, Neutral) 0.90, 0.07, 0.03;
+  (CDEJ, N5GtLIGt_8, Stability) 0.43, 0.07, 0.50;
+  (CDEJ, LILt_8, Instability) 0.01, 0.31, 0.68;
+  (CDEJ, LILt_8, Neutral) 0.02, 0.69, 0.29;
+  (CDEJ, LILt_8, Stability) 0.18, 0.15, 0.67;
+  (F, LIGt0, Instability) 0.13, 0.15, 0.72;
+  (F, LIGt0, Neutral) 0.15, 0.31, 0.54;
+  (F, LIGt0, Stability) 0.76, 0.17, 0.07;
+  (F, N1GtLIGt_4, Instability) 0.32, 0.38, 0.30;
+  (F, N1GtLIGt_4, Neutral) 0.19, 0.56, 0.25;
+  (F, N1GtLIGt_4, Stability) 0.21, 0.25, 0.54;
+  (F, N5GtLIGt_8, Instability) 0.46, 0.28, 0.26;
+  (F, N5GtLIGt_8, Neutral) 0.32, 0.14, 0.54;
+  (F, N5GtLIGt_8, Stability) 0.88, 0.11, 0.01;
+  (F, LILt_8, Instability) 0.29, 0.16, 0.55;
+  (F, LILt_8, Neutral) 0.16, 0.22, 0.62;
+  (F, LILt_8, Stability) 0.02, 0.47, 0.51;
+  (G, LIGt0, Instability) 0.05, 0.83, 0.12;
+  (G, LIGt0, Neutral) 0.24, 0.55, 0.21;
+  (G, LIGt0, Stability) 0.33, 0.23, 0.44;
+  (G, N1GtLIGt_4, Instability) 0.62, 0.24, 0.14;
+  (G, N1GtLIGt_4, Neutral) 0.48, 0.37, 0.15;
+  (G, N1GtLIGt_4, Stability) 0.72, 0.18, 0.10;
+  (G, N5GtLIGt_8, Instability) 0.03, 0.02, 0.95;
+  (G, N5GtLIGt_8, Neutral) 0.02, 0.91, 0.07;
+  (G, N5GtLIGt_8, Stability) 0.16, 0.39, 0.45;
+  (G, LILt_8, Instability) 0.07, 0.02, 0.91;
+  (G, LILt_8, Neutral) 0.36, 0.16, 0.48;
+  (G, LILt_8, Stability) 0.50, 0.02, 0.48;
+  (H, LIGt0, Instability) 0.23, 0.02, 0.75;
+  (H, LIGt0, Neutral) 0.56, 0.20, 0.24;
+  (H, LIGt0, Stability) 0.08, 0.72, 0.20;
+  (H, N1GtLIGt_4, Instability) 0.27, 0.06, 0.67;
+  (H, N1GtLIGt_4, Neutral) 0.28, 0.52, 0.20;
+  (H, N1GtLIGt_4, Stability) 0.37, 0.33, 0.30;
+  (H, N5GtLIGt_8, Instability) 0.55, 0.41, 0.04;
+  (H, N5GtLIGt_8, Neutral) 0.36, 0.39, 0.25;
+  (H, N5GtLIGt_8, Stability) 0.16, 0.16, 0.68;
+  (H, LILt_8, Instability) 0.23, 0.71, 0.06;
+  (H, LILt_8, Neutral) 0.09, 0.83, 0.08;
+  (H, LILt_8, Stability) 0.15, 0.12, 0.73;
+  (K, LIGt0, Instability) 0.44, 0.49, 0.07;
+  (K, LIGt0, Neutral) 0.16, 0.31, 0.53;
+  (K, LIGt0, Stability) 0.20, 0.52, 0.28;
+  (K, N1GtLIGt_4, Instability) 0.63, 0.05, 0.32;
+  (K, N1GtLIGt_4, Neutral) 0.42, 0.56, 0.02;
+  (K, N1GtLIGt_4, Stability) 0.09, 0.67, 0.24;
+  (K, N5GtLIGt_8, Instability) 0.18, 0.11, 0.71;
+  (K, N5GtLIGt_8, Neutral) 0.00, 0.96, 0.04;
+  (K, N5GtLIGt_8, Stability) 0.32, 0.26, 0.42;
+  (K, LILt_8, Instability) 0.41, 0.03, 0.56;
+  (K, LILt_8, Neutral) 0.27, 0.55, 0.18;
+  (K, LILt_8, Stability) 0.17, 0.48, 0.35;
+};
+probability ( MountainFcst | InsInMt ) {
+  (None) 0.10, 0.03, 0.87;
+  (Weak) 0.52, 0.10, 0.38;
+  (Strong) 0.26, 0.72, 0.02;
+};
+probability ( OutflowFrMt | InsInMt, WndHodograph ) {
+  (None, DCVZFavor) 0.52, 0.35, 0.13;
+  (None, StrongWest) 0.09, 0.75, 0.16;
+  (None, Westerly) 0.02, 0.82, 0.16;
+  (None, Other) 0.70, 0.29, 0.01;
+  (Weak, DCVZFavor) 0.61, 0.13, 0.26;
+  (Weak, StrongWest) 0.07, 0.42, 0.51;
+  (Weak, Westerly) 0.34, 0.55, 0.11;
+  (Weak, Other) 0.08, 0.09, 0.83;
+  (Strong, DCVZFavor) 0.57, 0.14, 0.29;
+  (Strong, StrongWest) 0.05, 0.47, 0.48;
+  (Strong, Westerly) 0.17, 0.12, 0.71;
+  (Strong, Other) 0.61, 0.11, 0.28;
+};
+probability ( VISCloudCov ) {
+  table 0.28, 0.38, 0.34;
+};
+probability ( WindAloft | Scenario ) {
+  (A) 0.10, 0.34, 0.41, 0.15;
+  (B) 0.15, 0.49, 0.07, 0.29;
+  (C) 0.06, 0.40, 0.43, 0.11;
+  (D) 0.29, 0.19, 0.06, 0.46;
+  (E) 0.00, 0.42, 0.26, 0.32;
+  (F) 0.08, 0.34, 0.02, 0.56;
+  (G) 0.09, 0.28, 0.54, 0.09;
+  (H) 0.14, 0.02, 0.62, 0.22;
+  (I) 0.14, 0.33, 0.37, 0.16;
+  (J) 0.25, 0.10, 0.53, 0.12;
+  (K) 0.09, 0.26, 0.61, 0.04;
+};
+probability ( R5Fcst | MountainFcst, N34StarFcst ) {
+  (XNIL, XNIL) 0.10, 0.10, 0.80;
+  (XNIL, SIG) 0.24, 0.74, 0.02;
+  (XNIL, SVR) 0.07, 0.50, 0.43;
+  (SIG, XNIL) 0.72, 0.02, 0.26;
+  (SIG, SIG) 0.44, 0.41, 0.15;
+  (SIG, SVR) 0.38, 0.39, 0.23;
+  (SVR, XNIL) 0.66, 0.30, 0.04;
+  (SVR, SIG) 0.26, 0.31, 0.43;
+  (SVR, SVR) 0.16, 0.35, 0.49;
+};
+probability ( ScenRel3_4 | Scenario ) {
+  (A) 0.11, 0.28, 0.31, 0.00, 0.30;
+  (B) 0.02, 0.17, 0.53, 0.20, 0.08;
+  (C) 0.12, 0.13, 0.17, 0.37, 0.21;
+  (D) 0.25, 0.11, 0.60, 0.02, 0.02;
+  (E) 0.10, 0.01, 0.49, 0.02, 0.38;
+  (F) 0.06, 0.45, 0.20, 0.10, 0.19;
+  (G) 0.04, 0.38, 0.05, 0.09, 0.44;
+  (H) 0.14, 0.19, 0.26, 0.07, 0.34;
+  (I) 0.05, 0.10, 0.16, 0.23, 0.46;
+  (J) 0.34, 0.17, 0.13, 0.30, 0.06;
+  (K) 0.06, 0.06, 0.30, 0.00, 0.58;
+};
+probability ( CombClouds | VISCloudCov, IRCloudCover ) {
+  (Cloudy, Cloudy) 0.27, 0.41, 0.32;
+  (Cloudy, PC) 0.14, 0.58, 0.28;
+  (Cloudy, Clear) 0.44, 0.34, 0.22;
+  (PC, Cloudy) 0.39, 0.04, 0.57;
+  (PC, PC) 0.28, 0.11, 0.61;
+  (PC, Clear) 0.48, 0.18, 0.34;
+  (Clear, Cloudy) 0.70, 0.21, 0.09;
+  (Clear, PC) 0.46, 0.46, 0.08;
+  (Clear, Clear) 0.18, 0.74, 0.08;
+};
+probability ( CombVerMo | N0_7muVerMo, SubjVertMo, QGVertMotion ) {
+  (StrongUp, StronUp, StrongUp) 0.10, 0.27, 0.45, 0.18;
+  (StrongUp, StronUp, WeakUp) 0.04, 0.08, 0.74, 0.14;
+  (StrongUp, StronUp, Neutral) 0.21, 0.25, 0.00, 0.54;
+  (StrongUp, StronUp, Down) 0.37, 0.04, 0.55, 0.04;
+  (StrongUp, WeakUp, StrongUp) 0.10, 0.01, 0.38, 0.51;
+  (StrongUp, WeakUp, WeakUp) 0.21, 0.04, 0.17, 0.58;
+  (StrongUp, WeakUp, Neutral) 0.07, 0.37, 0.31, 0.25;
+  (StrongUp, WeakUp, Down) 0.52, 0.04, 0.21, 0.23;
+  (StrongUp, Neutral, StrongUp) 0.21, 0.55, 0.13, 0.11;
+  (StrongUp, Neutral, WeakUp) 0.52, 0.13, 0.14, 0.21;
+  (StrongUp, Neutral, Neutral) 0.53, 0.25, 0.00, 0.22;
+  (StrongUp, Neutral, Down) 0.20, 0.04, 0.57, 0.19;
+  (StrongUp, Down, StrongUp) 0.49, 0.03, 0.06, 0.42;
+  (StrongUp, Down, WeakUp) 0.18, 0.04, 0.05, 0.73;
+  (StrongUp, Down, Neutral) 0.16, 0.61, 0.08, 0.15;
+  (StrongUp, Down, Down) 0.63, 0.07, 0.20, 0.10;
+  (WeakUp, StronUp, StrongUp) 0.46, 0.08, 0.25, 0.21;
+  (WeakUp, StronUp, WeakUp) 0.17, 0.35, 0.43, 0.05;
+  (WeakUp, StronUp, Neutral) 0.47, 0.26, 0.18, 0.09;
+  (WeakUp, StronUp, Down) 0.38, 0.22, 0.35, 0.05;
+  (WeakUp, WeakUp, StrongUp) 0.37, 0.21, 0.04, 0.38;
+  (WeakUp, WeakUp, WeakUp) 0.35, 0.30, 0.14, 0.21;
+  (WeakUp, WeakUp, Neutral) 0.23, 0.16, 0.57, 0.04;
+  (WeakUp, WeakUp, Down) 0.33, 0.07, 0.07, 0.53;
+  (WeakUp, Neutral, StrongUp) 0.20, 0.03, 0.68, 0.09;
+  (WeakUp, Neutral, WeakUp) 0.08, 0.07, 0.36, 0.49;
+  (WeakUp, Neutral, Neutral) 0.02, 0.15, 0.33, 0.50;
+  (WeakUp, Neutral, Down) 0.07, 0.48, 0.32, 0.13;
+  (WeakUp, Down, StrongUp) 0.26, 0.14, 0.01, 0.59;
+  (WeakUp, Down, WeakUp) 0.18, 0.08, 0.72, 0.02;
+  (WeakUp, Down, Neutral) 0.61, 0.24, 0.04, 0.11;
+  (WeakUp, Down, Down) 0.03, 0.08, 0.35, 0.54;
+  (Neutral, StronUp, StrongUp) 0.04, 0.19, 0.44, 0.33;
+  (Neutral, StronUp, WeakUp) 0.05, 0.16, 0.77, 0.02;
+  (Neutral, StronUp, Neutral) 0.20, 0.33, 0.22, 0.25;
+  (Neutral, StronUp, Down) 0.35, 0.54, 0.05, 0.06;
+  (Neutral, WeakUp, StrongUp) 0.14, 0.02, 0.83, 0.01;
+  (Neutral, WeakUp, WeakUp) 0.25, 0.39, 0.04, 0.32;
+  (Neutral, WeakUp, Neutral) 0.16, 0.30, 0.26, 0.28;
+  (Neutral, WeakUp, Down) 0.21, 0.26, 0.00, 0.53;
+  (Neutral, Neutral, StrongUp) 0.34, 0.45, 0.02, 0.19;
+  (Neutral, Neutral, WeakUp) 0.02, 0.26, 0.37, 0.35;
+  (Neutral, Neutral, Neutral) 0.27, 0.41, 0.05, 0.27;
+  (Neutral, Neutral, Down) 0.04, 0.53, 0.29, 0.14;
+  (Neutral, Down, StrongUp) 0.05, 0.63, 0.21, 0.11;
+  (Neutral, Down, WeakUp) 0.05, 0.20, 0.18, 0.57;
+  (Neutral, Down, Neutral) 0.44, 0.09, 0.29, 0.18;
+  (Neutral, Down, Down) 0.46, 0.19, 0.26, 0.09;
+  (Down, StronUp, StrongUp) 0.17, 0.32, 0.35, 0.16;
+  (Down, StronUp, WeakUp) 0.04, 0.10, 0.83, 0.03;
+  (Down, StronUp, Neutral) 0.93, 0.02, 0.04, 0.01;
+  (Down, StronUp, Down) 0.06, 0.19, 0.31, 0.44;
+  (Down, WeakUp, StrongUp) 0.31, 0.18, 0.15, 0.36;
+  (Down, WeakUp, WeakUp) 0.03, 0.69, 0.15, 0.13;
+  (Down, WeakUp, Neutral) 0.01, 0.57, 0.09, 0.33;
+  (Down, WeakUp, Down) 0.15, 0.04, 0.20, 0.61;
+  (Down, Neutral, StrongUp) 0.18, 0.03, 0.72, 0.07;
+  (Down, Neutral, WeakUp) 0.03, 0.05, 0.66, 0.26;
+  (Down, Neutral, Neutral) 0.36, 0.18, 0.35, 0.11;
+  (Down, Neutral, Down) 0.07, 0.36, 0.36, 0.21;
+  (Down, Down, StrongUp) 0.06, 0.60, 0.03, 0.31;
+  (Down, Down, WeakUp) 0.51, 0.47, 0.01, 0.01;
+  (Down, Down, Neutral) 0.07, 0.03, 0.46, 0.44;
+  (Down, Down, Down) 0.39, 0.03, 0.28, 0.30;
+};

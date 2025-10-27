@@ -16,22 +16,16 @@
 #include <random>
 
 /*
-Hard-EM learner for fixed Bayesian Network structure.
+Soft-EM learner for a fixed Bayesian Network structure.
 
-Algorithm summary:
-  * Parse variables, states, and parent sets from the input BIF (ignore prior CPTs).
-  * Load the data table, mapping tokens to state indices and marking missing entries.
-  * Initialize CPTs from complete rows when >=100 exist, otherwise start uniform.
-  * Iterate Hard-EM: per-row Markov-blanket inference for at most one missing variable,
-    accumulate hard counts, and perform an M-step with Dirichlet smoothing.
-  * Optionally perform a final soft E-step that adds fractional counts prior to a
-    concluding M-step.
-  * Emit the learned CPTs as a valid BIF file and optionally verify row-stochasticity.
-
-Complexity per iteration:
-  * O(num_rows * num_vars) operations, with no global inference; each row touches
-    one Markov blanket at most. CPT lookup is O(1) via precomputed strides.
-  * Parallelized over rows with OpenMP using thread-local count buffers.
+Summary:
+  * Parse BN structure from input BIF (variables, states, parents).
+  * Load data with missing values marked as -1.
+  * For each alpha in {0.1, 0.2, ..., 1.0}:
+      - Initialize CPTs from complete rows (falls back to uniform if needed).
+      - Run soft EM for up to 10 iterations with Dirichlet smoothing alpha.
+      - Track log-likelihood and keep the best alpha by log-likelihood.
+  * Write learned CPTs to the output BIF.
 */
 
 #ifdef _OPENMP
@@ -54,14 +48,7 @@ struct CLIOptions {
     std::string data_input;
     std::string bif_output;
     int iters = 10;
-    double alpha = -1.0;  // sentinel: <0 => default 1/r, ==0 => pure MLE, >0 => user value
-    bool soft_final = false;
-    int threads = 0;  // 0 => omp_get_max_threads()
-    bool check = false;
-    std::vector<double> alphas; // optional alpha sweep
-    int restarts = 1;           // random restarts
-    double ess = 0.0;           // BDeu equivalent sample size; 0 => disabled
-    bool bdeu = false;          // if true and ess<=0, treat --alpha as ESS
+    bool check = false; // keep an internal CPT sanity check toggle (not exposed)
 };
 
 class ArgParser {
@@ -74,77 +61,13 @@ class ArgParser {
 
     CLIOptions parse() {
         CLIOptions opt;
-        size_t i = 0;
-        auto require_value = [this](size_t idx, const std::string& flag) {
-            if (idx + 1 >= args_.size()) {
-                throw std::runtime_error("Missing value for " + flag);
-            }
-        };
-        std::vector<std::string> positional;
-        while (i < args_.size()) {
-            const std::string& token = args_[i];
-            if (token == "--iters") {
-                require_value(i, token);
-                opt.iters = std::stoi(args_[i + 1]);
-                i += 2;
-            } else if (token == "--alpha") {
-                require_value(i, token);
-                opt.alpha = std::stod(args_[i + 1]);
-                i += 2;
-            } else if (token == "--alphas") {
-                require_value(i, token);
-                std::string list = args_[i + 1];
-                std::stringstream ss(list);
-                std::string item;
-                while (std::getline(ss, item, ',')) {
-                    if (!item.empty()) {
-                        opt.alphas.push_back(std::stod(item));
-                    }
-                }
-                i += 2;
-            } else if (token == "--soft_final") {
-                opt.soft_final = true;
-                ++i;
-            } else if (token == "--threads") {
-                require_value(i, token);
-                opt.threads = std::stoi(args_[i + 1]);
-                i += 2;
-            } else if (token == "--check") {
-                opt.check = true;
-                ++i;
-            } else if (token == "--ess") {
-                require_value(i, token);
-                opt.ess = std::stod(args_[i + 1]);
-                i += 2;
-            } else if (token == "--bdeu") {
-                opt.bdeu = true;
-                ++i;
-            } else if (token == "--restarts") {
-                require_value(i, token);
-                opt.restarts = std::max(1, std::stoi(args_[i + 1]));
-                i += 2;
-            } else if (token == "--help" || token == "-h") {
-                throw std::runtime_error(
-                    "Usage: learn_bn <input.bif> <data.dat> <output.bif> "
-                    "[--iters K] [--alpha a | --alphas a1,a2,... | --ess E --bdeu] [--restarts R] "
-                    "[--soft_final] [--threads t] [--check]");
-            } else if (!token.empty() && token[0] == '-') {
-                throw std::runtime_error("Unknown flag " + token);
-            } else {
-                positional.push_back(token);
-                ++i;
-            }
+        // Only accept three positional arguments: input.bif, data.dat, output.bif
+        if (args_.size() != 3) {
+            throw std::runtime_error("Usage: learn_bn <input.bif> <data.dat> <output.bif>");
         }
-        if (positional.size() != 3) {
-            throw std::runtime_error(
-                "Expected 3 positional arguments: <input.bif> <data.dat> <output.bif>");
-        }
-        opt.bif_input = positional[0];
-        opt.data_input = positional[1];
-        opt.bif_output = positional[2];
-        if (opt.iters <= 0) {
-            throw std::runtime_error("--iters must be > 0");
-        }
+        opt.bif_input = args_[0];
+        opt.data_input = args_[1];
+        opt.bif_output = args_[2];
         return opt;
     }
 
@@ -1475,119 +1398,47 @@ int main(int argc, char** argv) {
         CLIOptions options = parser.parse();
         BN bn = parse_bif(options.bif_input);
         Data data = load_data(options.data_input, bn);
-        // Precompute scheduling and buckets
+        // Precompute scheduling and buckets for soft E-step
         auto topo = topological_order(bn);
-        std::vector<int> topo_rev(topo.rbegin(), topo.rend());
         auto mb = build_markov_blankets(bn);
         auto buckets = build_buckets(bn, data, mb);
 
-        // Decide smoothing mode: alpha (default) vs BDeu (ESS)
-        bool use_bdeu = false;
-        double ess = 0.0;
-        if (!options.alphas.empty() || options.alpha >= 0.0) {
-            use_bdeu = false; // user specified alpha/sweep
-        } else if (options.bdeu || options.ess > 0.0) {
-            use_bdeu = true;
-            ess = options.ess > 0.0 ? options.ess : options.alpha; // allow --bdeu with --alpha as ESS
-        }
+        // Alpha sweep: 0.1, 0.2, ..., 1.0
+        std::vector<double> alpha_sweep;
+        for (int i = 1; i <= 10; ++i) alpha_sweep.push_back(static_cast<double>(i) / 10.0);
 
         std::vector<double> best_theta;
         double best_loglik = -std::numeric_limits<double>::infinity();
-        double best_alpha = (options.alpha >= 0.0 ? options.alpha : -1.0);
-        double best_ess = (ess > 0.0 ? ess : 5.0);
-        int best_restart = 0;
+        double best_alpha = -1.0;
         int best_iters_run = 0;
 
-        if (use_bdeu) {
-            for (int r = 0; r < options.restarts; ++r) {
-                std::vector<double> theta(bn.total_cpt_entries, 0.0);
-                if (data.complete_rows >= 100 && r == 0) {
-                    initialize_from_complete_rows(bn, data, -1.0, true, best_ess, theta);
-                } else {
-                    std::mt19937 rng(static_cast<uint32_t>(12345u + r * 997u));
-                    random_dirichlet_initialize(bn, theta, rng);
-                }
-                std::vector<double> counts(bn.total_cpt_entries, 0.0);
-                double prev_loglik = -std::numeric_limits<double>::infinity();
-                double loglik = prev_loglik;
-                int iterations_run = 0;
-                for (int iter = 0; iter < options.iters; ++iter) {
-                    const auto& order = (iter % 2 == 0) ? topo : topo_rev;
-                    hard_e_step_bucketed(bn, data, theta, buckets, order, counts, options.threads);
-                    m_step(bn, counts, -1.0, true, best_ess, theta);
-                    loglik = compute_loglik(bn, data, theta, options.threads);
-                    ++iterations_run;
-                    if (iter > 0) {
-                        double denom = std::max(1.0, std::fabs(prev_loglik));
-                        if ((loglik - prev_loglik) / denom < 1e-5) {
-                            break;
-                        }
+        for (double this_alpha : alpha_sweep) {
+            std::vector<double> theta(bn.total_cpt_entries, 0.0);
+            // Initialize from complete rows; falls back to uniform where needed
+            initialize_from_complete_rows(bn, data, this_alpha, /*use_bdeu=*/false, /*ess=*/0.0, theta);
+
+            std::vector<double> counts(bn.total_cpt_entries, 0.0);
+            double prev_loglik = -std::numeric_limits<double>::infinity();
+            double loglik = prev_loglik;
+            int iterations_run = 0;
+            for (int iter = 0; iter < options.iters; ++iter) {
+                soft_e_step_bucketed(bn, data, theta, buckets, topo, counts, /*threads=*/0);
+                m_step(bn, counts, this_alpha, /*use_bdeu=*/false, /*ess=*/0.0, theta);
+                loglik = compute_loglik(bn, data, theta, /*threads=*/0);
+                ++iterations_run;
+                if (iter > 0) {
+                    double denom = std::max(1.0, std::fabs(prev_loglik));
+                    if ((loglik - prev_loglik) / denom < 1e-5) {
+                        break;
                     }
-                    prev_loglik = loglik;
                 }
-                if (options.soft_final) {
-                    const auto& order = topo;
-                    soft_e_step_bucketed(bn, data, theta, buckets, order, counts, options.threads);
-                    m_step(bn, counts, -1.0, true, best_ess, theta);
-                    loglik = compute_loglik(bn, data, theta, options.threads);
-                }
-                if (loglik > best_loglik) {
-                    best_loglik = loglik;
-                    best_theta = std::move(theta);
-                    best_restart = r;
-                    best_iters_run = iterations_run;
-                }
+                prev_loglik = loglik;
             }
-        } else {
-            // Alpha path (with optional sweep)
-            std::vector<double> alphas;
-            if (!options.alphas.empty()) {
-                alphas = options.alphas;
-            } else {
-                alphas.push_back(options.alpha);
-            }
-            for (size_t ai = 0; ai < alphas.size(); ++ai) {
-                double this_alpha = alphas[ai];
-                for (int r = 0; r < options.restarts; ++r) {
-                    std::vector<double> theta(bn.total_cpt_entries, 0.0);
-                    if (data.complete_rows >= 100 && r == 0) {
-                        initialize_from_complete_rows(bn, data, this_alpha, false, 0.0, theta);
-                    } else {
-                        std::mt19937 rng(static_cast<uint32_t>(12345u + r * 997u + static_cast<unsigned>(ai) * 7919u));
-                        random_dirichlet_initialize(bn, theta, rng);
-                    }
-                    std::vector<double> counts(bn.total_cpt_entries, 0.0);
-                    double prev_loglik = -std::numeric_limits<double>::infinity();
-                    double loglik = prev_loglik;
-                    int iterations_run = 0;
-                    for (int iter = 0; iter < options.iters; ++iter) {
-                        const auto& order = (iter % 2 == 0) ? topo : topo_rev;
-                        hard_e_step_bucketed(bn, data, theta, buckets, order, counts, options.threads);
-                        m_step(bn, counts, this_alpha, false, 0.0, theta);
-                        loglik = compute_loglik(bn, data, theta, options.threads);
-                        ++iterations_run;
-                        if (iter > 0) {
-                            double denom = std::max(1.0, std::fabs(prev_loglik));
-                            if ((loglik - prev_loglik) / denom < 1e-5) {
-                                break;
-                            }
-                        }
-                        prev_loglik = loglik;
-                    }
-                    if (options.soft_final) {
-                        const auto& order = topo;
-                        soft_e_step_bucketed(bn, data, theta, buckets, order, counts, options.threads);
-                        m_step(bn, counts, this_alpha, false, 0.0, theta);
-                        loglik = compute_loglik(bn, data, theta, options.threads);
-                    }
-                    if (loglik > best_loglik) {
-                        best_loglik = loglik;
-                        best_theta = std::move(theta);
-                        best_alpha = this_alpha;
-                        best_restart = r;
-                        best_iters_run = iterations_run;
-                    }
-                }
+            if (loglik > best_loglik) {
+                best_loglik = loglik;
+                best_theta = std::move(theta);
+                best_alpha = this_alpha;
+                best_iters_run = iterations_run;
             }
         }
 
@@ -1599,13 +1450,8 @@ int main(int argc, char** argv) {
             data.nrows > 0 ? 100.0 * static_cast<double>(data.single_missing_rows) / data.nrows : 0.0;
         std::ostringstream summary;
         summary << "rows=" << data.nrows << " single_missing=" << std::fixed << std::setprecision(2)
-                << single_missing_pct << "% iters=" << best_iters_run;
-        if (use_bdeu) {
-            summary << " ess=" << best_ess;
-        } else {
-            summary << " best_alpha=" << best_alpha;
-        }
-        summary << " restart=" << best_restart
+                << single_missing_pct << "% iters=" << best_iters_run
+                << " best_alpha=" << best_alpha
                 << " loglik=" << std::setprecision(6) << best_loglik << "\n";
         std::cerr << summary.str();
     } catch (const std::exception& ex) {
