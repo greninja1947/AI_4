@@ -15,6 +15,8 @@
 #include <vector>
 #include <random>
 
+#include "bn_types.h"
+
 /*
 Soft-EM learner for a fixed Bayesian Network structure.
 
@@ -211,37 +213,7 @@ class Tokenizer {
     Token peek_token_;
 };
 
-struct Variable {
-    std::string name;
-    std::vector<std::string> states;
-    std::vector<std::string> parent_names;  // temporary before resolving indices
-    std::unordered_map<std::string, int> state_to_index;
-    std::vector<int> parents;
-    std::vector<int> children;
-    std::vector<size_t> parent_strides;
-    size_t cpt_offset = 0;
-    size_t q = 1;  // number of parent configurations
-    int r = 0;     // number of states
-};
-
-struct BN {
-    std::vector<Variable> vars;
-    std::unordered_map<std::string, int> name_to_index;
-    size_t total_cpt_entries = 0;
-    size_t max_states = 0;
-};
-
-struct Data {
-    std::vector<int32_t> values;
-    size_t nrows = 0;
-    size_t nvars = 0;
-    size_t complete_rows = 0;
-    size_t single_missing_rows = 0;
-
-    const int32_t* row(size_t idx) const {
-        return values.data() + idx * nvars;
-    }
-};
+// Variable, BN, Data, and Buckets are now defined in bn_types.h
 
 std::string readFileToString(const std::string& path) {
     std::ifstream in(path);
@@ -736,10 +708,7 @@ std::vector<int> topological_order(const BN& bn) {
     return order;
 }
 
-struct Buckets {
-    std::vector<size_t> complete;
-    std::vector<std::vector<size_t>> per_var_sorted;
-};
+// Buckets is now defined in bn_types.h
 
 Buckets build_buckets(const BN& bn, const Data& data, const std::vector<std::vector<int>>& mb) {
     Buckets b;
@@ -1387,6 +1356,12 @@ void write_bif(const std::string& path, const BN& bn, const std::vector<double>&
     }
 }
 
+// ============================================================================
+// CORE EM ALGORITHM - Extracted for clarity
+// See em_algorithm.cpp for the pure algorithm implementation
+// ============================================================================
+#include "em_algorithm.cpp"
+
 }  // namespace
 
 int main(int argc, char** argv) {
@@ -1394,66 +1369,37 @@ int main(int argc, char** argv) {
     std::ios::sync_with_stdio(false);
     std::cin.tie(nullptr);
     try {
+        // Parse command-line arguments
         ArgParser parser(argc, argv);
         CLIOptions options = parser.parse();
+        
+        // Load Bayesian Network structure and data
         BN bn = parse_bif(options.bif_input);
         Data data = load_data(options.data_input, bn);
-        // Precompute scheduling and buckets for soft E-step
-        auto topo = topological_order(bn);
-        auto mb = build_markov_blankets(bn);
-        auto buckets = build_buckets(bn, data, mb);
-
-        // Alpha sweep: 0.1, 0.2, ..., 1.0
-        std::vector<double> alpha_sweep;
-        for (int i = 1; i <= 10; ++i) alpha_sweep.push_back(static_cast<double>(i) / 10.0);
-
+        
+        // Run the core EM learning algorithm (see em_algorithm.cpp)
         std::vector<double> best_theta;
-        double best_loglik = -std::numeric_limits<double>::infinity();
         double best_alpha = -1.0;
         int best_iters_run = 0;
-
-        for (double this_alpha : alpha_sweep) {
-            std::vector<double> theta(bn.total_cpt_entries, 0.0);
-            // Initialize from complete rows; falls back to uniform where needed
-            initialize_from_complete_rows(bn, data, this_alpha, /*use_bdeu=*/false, /*ess=*/0.0, theta);
-
-            std::vector<double> counts(bn.total_cpt_entries, 0.0);
-            double prev_loglik = -std::numeric_limits<double>::infinity();
-            double loglik = prev_loglik;
-            int iterations_run = 0;
-            for (int iter = 0; iter < options.iters; ++iter) {
-                soft_e_step_bucketed(bn, data, theta, buckets, topo, counts, /*threads=*/0);
-                m_step(bn, counts, this_alpha, /*use_bdeu=*/false, /*ess=*/0.0, theta);
-                loglik = compute_loglik(bn, data, theta, /*threads=*/0);
-                ++iterations_run;
-                if (iter > 0) {
-                    double denom = std::max(1.0, std::fabs(prev_loglik));
-                    if ((loglik - prev_loglik) / denom < 1e-5) {
-                        break;
-                    }
-                }
-                prev_loglik = loglik;
-            }
-            if (loglik > best_loglik) {
-                best_loglik = loglik;
-                best_theta = std::move(theta);
-                best_alpha = this_alpha;
-                best_iters_run = iterations_run;
-            }
-        }
-
+        double best_loglik = run_em_algorithm(
+            bn, data, options.iters, 1e-5,
+            best_theta, best_alpha, best_iters_run
+        );
+        
+        // Sanity check CPTs (optional)
         if (options.check && !check_cpts(bn, best_theta)) {
             throw std::runtime_error("CPT check failed: some rows do not sum to 1");
         }
+        
+        // Write learned parameters to output file
         write_bif(options.bif_output, bn, best_theta);
-        double single_missing_pct =
-            data.nrows > 0 ? 100.0 * static_cast<double>(data.single_missing_rows) / data.nrows : 0.0;
-        std::ostringstream summary;
-        summary << "rows=" << data.nrows << " single_missing=" << std::fixed << std::setprecision(2)
-                << single_missing_pct << "% iters=" << best_iters_run
-                << " best_alpha=" << best_alpha
-                << " loglik=" << std::setprecision(6) << best_loglik << "\n";
-        std::cerr << summary.str();
+        
+        // Print summary statistics
+        print_algorithm_summary(
+            data.nrows, data.single_missing_rows,
+            best_iters_run, best_alpha, best_loglik
+        );
+        
     } catch (const std::exception& ex) {
         std::cerr << "Error: " << ex.what() << "\n";
         return 1;
