@@ -3,6 +3,7 @@
 #include <cmath>
 #include <cstdint>
 #include <fstream>
+#include <cstdlib>
 #include <iomanip>
 #include <limits>
 #include <memory>
@@ -15,24 +16,7 @@
 #include <vector>
 #include <random>
 
-#include "bn_types.h"
 
-/*
-Soft-EM learner for a fixed Bayesian Network structure.
-
-Summary:
-  * Parse BN structure from input BIF (variables, states, parents).
-  * Load data with missing values marked as -1.
-  * For each alpha in {0.1, 0.2, ..., 1.0}:
-      - Initialize CPTs from complete rows (falls back to uniform if needed).
-      - Run soft EM for up to 10 iterations with Dirichlet smoothing alpha.
-      - Track log-likelihood and keep the best alpha by log-likelihood.
-  * Write learned CPTs to the output BIF.
-*/
-
-#ifdef _OPENMP
-#include <omp.h>
-#endif
 
 namespace {
 
@@ -213,7 +197,40 @@ class Tokenizer {
     Token peek_token_;
 };
 
-// Variable, BN, Data, and Buckets are now defined in bn_types.h
+struct Variable {
+    std::string name;
+    std::vector<std::string> states;
+    std::vector<std::string> parent_names;  // temporary before resolving indices
+    std::unordered_map<std::string, int> state_to_index;
+    std::vector<int> parents;
+    std::vector<int> children;
+    std::vector<size_t> parent_strides;
+    size_t cpt_offset = 0;
+    size_t q = 1;  // number of parent configurations
+    int r = 0;     // number of states
+    std::vector<double> raw_cpt_values;
+};
+
+struct BN {
+    std::vector<Variable> vars;
+    std::unordered_map<std::string, int> name_to_index;
+    size_t total_cpt_entries = 0;
+    size_t max_states = 0;
+    std::vector<double> fixed_values;
+    std::vector<uint8_t> fixed_mask;
+};
+
+struct Data {
+    std::vector<int32_t> values;
+    size_t nrows = 0;
+    size_t nvars = 0;
+    size_t complete_rows = 0;
+    size_t single_missing_rows = 0;
+
+    const int32_t* row(size_t idx) const {
+        return values.data() + idx * nvars;
+    }
+};
 
 std::string readFileToString(const std::string& path) {
     std::ifstream in(path);
@@ -296,6 +313,97 @@ void skipBlock(Tokenizer& tz) {
     tz.expectSymbol(';');
 }
 
+bool is_number_token(const std::string& text) {
+    if (text.empty()) {
+        return false;
+    }
+    char* end = nullptr;
+    std::strtod(text.c_str(), &end);
+    return end != text.c_str() && *end == '\0';
+}
+
+double parse_probability_value(const std::string& text) {
+    char* end = nullptr;
+    double value = std::strtod(text.c_str(), &end);
+    if (end == text.c_str() || *end != '\0') {
+        throw std::runtime_error("Invalid probability value '" + text + "'");
+    }
+    return value;
+}
+
+void parse_probability_value_list(Tokenizer& tz, std::vector<double>& dest, const Token* first_token) {
+    Token current;
+    if (first_token) {
+        current = *first_token;
+    } else {
+        current = tz.expectIdentifier();
+    }
+    while (true) {
+        if (!is_number_token(current.text)) {
+            throw std::runtime_error("Expected numeric probability value");
+        }
+        dest.push_back(parse_probability_value(current.text));
+        Token sep = tz.next();
+        if (sep.type == Token::Type::Symbol && sep.symbol == ',') {
+            current = tz.expectIdentifier();
+            continue;
+        }
+        if (sep.type == Token::Type::Symbol && sep.symbol == ';') {
+            break;
+        }
+        throw std::runtime_error("Expected ',' or ';' after probability value");
+    }
+}
+
+void parse_probability_body(Tokenizer& tz, Variable& var) {
+    tz.expectSymbol('{');
+    var.raw_cpt_values.clear();
+    while (true) {
+        Token t = tz.next();
+        if (t.type == Token::Type::End) {
+            throw std::runtime_error("Unexpected EOF inside probability block for variable " + var.name);
+        }
+        if (t.type == Token::Type::Symbol) {
+            if (t.symbol == '}') {
+                break;
+            }
+            if (t.symbol == '(') {
+                int depth = 1;
+                while (depth > 0) {
+                    Token inner = tz.next();
+                    if (inner.type == Token::Type::End) {
+                        throw std::runtime_error("Unexpected EOF inside parent assignment for " + var.name);
+                    }
+                    if (inner.type == Token::Type::Symbol) {
+                        if (inner.symbol == '(') {
+                            ++depth;
+                        } else if (inner.symbol == ')') {
+                            --depth;
+                        }
+                    }
+                }
+                parse_probability_value_list(tz, var.raw_cpt_values, nullptr);
+                continue;
+            }
+            if (t.symbol == ';') {
+                continue;
+            }
+        }
+        if (t.type == Token::Type::Identifier) {
+            if (t.text == "table" || t.text == "default") {
+                parse_probability_value_list(tz, var.raw_cpt_values, nullptr);
+                continue;
+            }
+            if (is_number_token(t.text)) {
+                parse_probability_value_list(tz, var.raw_cpt_values, &t);
+                continue;
+            }
+        }
+        throw std::runtime_error("Unexpected token '" + t.text + "' in probability block for variable " + var.name);
+    }
+    tz.expectSymbol(';');
+}
+
 void parseProbability(Tokenizer& tz, BN& bn) {
     tz.expectSymbol('(');
     Token var_tok = tz.expectIdentifier();
@@ -328,7 +436,7 @@ void parseProbability(Tokenizer& tz, BN& bn) {
     if (!(tok.type == Token::Type::Symbol && tok.symbol == ')')) {
         tz.expectSymbol(')');
     }
-    skipBlock(tz);
+    parse_probability_body(tz, var);
 }
 
 BN parse_bif(const std::string& path) {
@@ -407,6 +515,29 @@ BN parse_bif(const std::string& path) {
     for (auto& var : bn.vars) {
         var.cpt_offset = offset;
         offset += static_cast<size_t>(var.r) * var.q;
+    }
+    bn.fixed_mask.assign(bn.total_cpt_entries, 0);
+    bn.fixed_values.assign(bn.total_cpt_entries, 0.0);
+    for (auto& var : bn.vars) {
+        size_t expected = static_cast<size_t>(var.r) * var.q;
+        if (!var.raw_cpt_values.empty()) {
+            if (var.raw_cpt_values.size() != expected) {
+                std::ostringstream oss;
+                oss << "Probability table for variable " << var.name
+                    << " has " << var.raw_cpt_values.size() << " entries but expected "
+                    << expected;
+                throw std::runtime_error(oss.str());
+            }
+            for (size_t i = 0; i < expected; ++i) {
+                double value = var.raw_cpt_values[i];
+                if (value >= 0.0) {
+                    bn.fixed_mask[var.cpt_offset + i] = 1;
+                    bn.fixed_values[var.cpt_offset + i] = value;
+                }
+            }
+        }
+        var.raw_cpt_values.clear();
+        var.raw_cpt_values.shrink_to_fit();
     }
     return bn;
 }
@@ -609,23 +740,6 @@ inline bool accumulate_family(const std::vector<Variable>& vars, int var_index,
     return true;
 }
 
-struct ThreadContext {
-    std::vector<double> counts;
-    std::vector<double> scratch;
-};
-
-int resolve_threads(int requested) {
-#ifdef _OPENMP
-    if (requested <= 0) {
-        return omp_get_max_threads();
-    }
-    return std::max(1, requested);
-#else
-    (void)requested;
-    return 1;
-#endif
-}
-
 struct RowInfo {
     int first_missing = -1;
     int missing_count = 0;
@@ -655,369 +769,323 @@ void accumulate_complete_row(const BN& bn, const int32_t* row, std::vector<doubl
     }
 }
 
+void apply_fixed_entries(const BN& bn, std::vector<double>& theta) {
+    if (bn.fixed_mask.empty()) {
+        return;
+    }
+    size_t limit = std::min(bn.fixed_mask.size(), theta.size());
+    for (size_t i = 0; i < limit; ++i) {
+        if (bn.fixed_mask[i]) {
+            theta[i] = bn.fixed_values[i];
+        }
+    }
+}
+
 // Build Markov blanket node lists for each variable (parents, children, co-parents of children, children themselves)
 std::vector<std::vector<int>> build_markov_blankets(const BN& bn) {
-    size_t n = bn.vars.size();
-    std::vector<std::vector<int>> mb(n);
-    for (size_t i = 0; i < n; ++i) {
-        const Variable& x = bn.vars[i];
-        std::vector<int> nodes;
-        nodes.reserve(x.parents.size() + x.children.size() * 3);
-        // parents
-        for (int p : x.parents) nodes.push_back(p);
-        // children and co-parents
-        for (int c : x.children) {
-            nodes.push_back(c);
-            const Variable& y = bn.vars[static_cast<size_t>(c)];
-            for (int cp : y.parents) {
-                if (cp != static_cast<int>(i)) nodes.push_back(cp);
+    const size_t total_variables = bn.vars.size();
+    std::vector<std::vector<int>> markov_blanket_map(total_variables);
+    
+    for (size_t var_index = 0; var_index < total_variables; var_index++) {
+        const Variable& target_variable = bn.vars[var_index];
+        std::vector<int> blanket_nodes;
+        
+        // Pre-allocate space for efficiency
+        size_t estimated_size = target_variable.parents.size() + (target_variable.children.size() * 3);
+        blanket_nodes.reserve(estimated_size);
+        
+        // Add all parent nodes to the blanket
+        for (const auto& parent_node : target_variable.parents) {
+            blanket_nodes.push_back(parent_node);
+        }
+        
+        // Add children and their other parents (co-parents)
+        for (const auto& child_node : target_variable.children) {
+            blanket_nodes.push_back(child_node);
+            
+            const Variable& child_variable = bn.vars[static_cast<size_t>(child_node)];
+            for (const auto& coparent_node : child_variable.parents) {
+                if (coparent_node != static_cast<int>(var_index)) {
+                    blanket_nodes.push_back(coparent_node);
+                }
             }
         }
-        // deduplicate
-        std::sort(nodes.begin(), nodes.end());
-        nodes.erase(std::unique(nodes.begin(), nodes.end()), nodes.end());
-        mb[i] = std::move(nodes);
+        
+        // Remove duplicates by sorting and erasing unique elements
+        std::sort(blanket_nodes.begin(), blanket_nodes.end());
+        auto last_unique = std::unique(blanket_nodes.begin(), blanket_nodes.end());
+        blanket_nodes.erase(last_unique, blanket_nodes.end());
+        
+        markov_blanket_map[var_index] = std::move(blanket_nodes);
     }
-    return mb;
+    
+    return markov_blanket_map;
 }
 
 // Compute topological order (Kahn's algorithm) using parent edges
 std::vector<int> topological_order(const BN& bn) {
-    size_t n = bn.vars.size();
-    std::vector<int> indeg(n, 0);
-    for (size_t i = 0; i < n; ++i) {
-        for (int c : bn.vars[i].children) indeg[static_cast<size_t>(c)]++;
-    }
-    std::vector<int> q;
-    q.reserve(n);
-    for (size_t i = 0; i < n; ++i) if (indeg[i] == 0) q.push_back(static_cast<int>(i));
-    std::vector<int> order;
-    order.reserve(n);
-    for (size_t head = 0; head < q.size(); ++head) {
-        int u = q[head];
-        order.push_back(u);
-        for (int v : bn.vars[static_cast<size_t>(u)].children) {
-            if (--indeg[static_cast<size_t>(v)] == 0) q.push_back(v);
+    const size_t total_vars = bn.vars.size();
+    std::vector<int> incoming_edges(total_vars, 0);
+    
+    // Calculate in-degree for each node
+    for (size_t var_idx = 0; var_idx < total_vars; var_idx++) {
+        const auto& current_var = bn.vars[var_idx];
+        for (const auto& child_node : current_var.children) {
+            incoming_edges[static_cast<size_t>(child_node)]++;
         }
     }
-    if (order.size() != n) {
-        // Graph may have cycles (shouldn't in BN); fallback to 0..n-1
-        order.clear();
-        for (size_t i = 0; i < n; ++i) order.push_back(static_cast<int>(i));
+    
+    // Initialize queue with nodes having zero in-degree
+    std::vector<int> processing_queue;
+    processing_queue.reserve(total_vars);
+    for (size_t idx = 0; idx < total_vars; idx++) {
+        if (incoming_edges[idx] == 0) {
+            processing_queue.push_back(static_cast<int>(idx));
+        }
     }
-    return order;
+    
+    // Process nodes in topological order
+    std::vector<int> sorted_order;
+    sorted_order.reserve(total_vars);
+    size_t queue_pos = 0;
+    while (queue_pos < processing_queue.size()) {
+        int current_node = processing_queue[queue_pos++];
+        sorted_order.push_back(current_node);
+        
+        const auto& node_children = bn.vars[static_cast<size_t>(current_node)].children;
+        for (const auto& child : node_children) {
+            size_t child_idx = static_cast<size_t>(child);
+            incoming_edges[child_idx]--;
+            if (incoming_edges[child_idx] == 0) {
+                processing_queue.push_back(child);
+            }
+        }
+    }
+    
+    // Fallback: if cycle detected, return sequential ordering
+    if (sorted_order.size() != total_vars) {
+        sorted_order.clear();
+        for (size_t idx = 0; idx < total_vars; idx++) {
+            sorted_order.push_back(static_cast<int>(idx));
+        }
+    }
+    
+    return sorted_order;
 }
 
-// Buckets is now defined in bn_types.h
+struct Buckets {
+    std::vector<size_t> complete;
+    std::vector<std::vector<size_t>> per_var_sorted;
+};
 
 Buckets build_buckets(const BN& bn, const Data& data, const std::vector<std::vector<int>>& mb) {
-    Buckets b;
-    b.per_var_sorted.assign(bn.vars.size(), {});
-    // First collect unsorted rows
-    std::vector<std::vector<size_t>> per_var(bn.vars.size());
-    for (size_t row_idx = 0; row_idx < data.nrows; ++row_idx) {
-        const int32_t* row = data.row(row_idx);
-        RowInfo info = analyze_row(row, data.nvars);
-        if (info.missing_count == 0) {
-            b.complete.push_back(row_idx);
-        } else if (info.first_missing >= 0) {
-            per_var[static_cast<size_t>(info.first_missing)].push_back(row_idx);
-        }
-    }
-    // Rank each bucket by observational richness of the Markov blanket
-    for (size_t vi = 0; vi < bn.vars.size(); ++vi) {
-        const auto& rows = per_var[vi];
-        if (rows.empty()) continue;
-        std::vector<std::pair<int,int>> key_index; // (richness, index into rows)
-        key_index.reserve(rows.size());
-        const auto& mb_nodes = mb[vi];
-        for (size_t j = 0; j < rows.size(); ++j) {
-            const int32_t* row = data.row(rows[j]);
-            int score = 0;
-            for (int node : mb_nodes) {
-                if (row[node] >= 0) ++score;
+    Buckets bucket_structure;
+    const size_t num_variables = bn.vars.size();
+    bucket_structure.per_var_sorted.assign(num_variables, {});
+    
+    // Phase 1: Collect unsorted rows per variable
+    std::vector<std::vector<size_t>> unsorted_per_variable(num_variables);
+    
+    for (size_t current_row = 0; current_row < data.nrows; current_row++) {
+        const int32_t* row_data = data.row(current_row);
+        RowInfo row_info = analyze_row(row_data, data.nvars);
+        
+        if (row_info.missing_count == 0) {
+            bucket_structure.complete.push_back(current_row);
+        } else {
+            if (row_info.first_missing >= 0) {
+                size_t missing_var_idx = static_cast<size_t>(row_info.first_missing);
+                unsorted_per_variable[missing_var_idx].push_back(current_row);
             }
-            key_index.emplace_back(score, static_cast<int>(j));
         }
-        std::sort(key_index.begin(), key_index.end(), [](const auto& a, const auto& b){
-            return a.first > b.first; // descending richness
-        });
-        b.per_var_sorted[vi].reserve(rows.size());
-        for (const auto& p : key_index) b.per_var_sorted[vi].push_back(rows[static_cast<size_t>(p.second)]);
     }
-    return b;
+    
+    // Phase 2: Sort each bucket by Markov blanket observational richness
+    for (size_t variable_idx = 0; variable_idx < num_variables; variable_idx++) {
+        const auto& row_indices = unsorted_per_variable[variable_idx];
+        
+        if (row_indices.empty()) {
+            continue;
+        }
+        
+        // Create richness score pairs: (score, row_index_position)
+        std::vector<std::pair<int, int>> richness_pairs;
+        richness_pairs.reserve(row_indices.size());
+        
+        const auto& blanket_nodes = mb[variable_idx];
+        
+        for (size_t pos = 0; pos < row_indices.size(); pos++) {
+            const int32_t* row_data = data.row(row_indices[pos]);
+            int richness_score = 0;
+            
+            // Count observed nodes in Markov blanket
+            for (const auto& blanket_node : blanket_nodes) {
+                if (row_data[blanket_node] >= 0) {
+                    richness_score++;
+                }
+            }
+            
+            richness_pairs.emplace_back(richness_score, static_cast<int>(pos));
+        }
+        
+        // Sort by richness in descending order
+        std::sort(richness_pairs.begin(), richness_pairs.end(), 
+                  [](const auto& first, const auto& second) {
+                      return first.first > second.first;
+                  });
+        
+        // Build sorted row indices based on richness ranking
+        bucket_structure.per_var_sorted[variable_idx].reserve(row_indices.size());
+        for (const auto& pair : richness_pairs) {
+            size_t original_pos = static_cast<size_t>(pair.second);
+            bucket_structure.per_var_sorted[variable_idx].push_back(row_indices[original_pos]);
+        }
+    }
+    
+    return bucket_structure;
 }
 
-// Hard E-step using bucketed processing and scheduling order
-void hard_e_step_bucketed(const BN& bn, const Data& data, const std::vector<double>& theta,
-                          const Buckets& buckets, const std::vector<int>& visit_order,
-                          std::vector<double>& counts, int threads) {
-    const size_t total = bn.total_cpt_entries;
-    threads = resolve_threads(threads);
-    std::vector<ThreadContext> contexts(static_cast<size_t>(threads));
-    for (auto& ctx : contexts) {
-        ctx.counts.assign(total, 0.0);
-        ctx.scratch.assign(bn.max_states, 0.0);
-    }
-    // Process fully-observed rows first
-#pragma omp parallel for schedule(static) num_threads(threads)
-    for (size_t k = 0; k < buckets.complete.size(); ++k) {
-        int tid = 0;
-#ifdef _OPENMP
-        tid = omp_get_thread_num();
-#endif
-        ThreadContext& ctx = contexts[static_cast<size_t>(tid)];
-        const int32_t* row = data.row(buckets.complete[k]);
-        accumulate_complete_row(bn, row, ctx.counts, 1.0, -1, -1);
-    }
-    // Then for each variable bucket in the chosen order
-    for (int v : visit_order) {
-        const auto& rows = buckets.per_var_sorted[static_cast<size_t>(v)];
-        if (rows.empty()) continue;
-#pragma omp parallel for schedule(static) num_threads(threads)
-        for (size_t k = 0; k < rows.size(); ++k) {
-            int tid = 0;
-#ifdef _OPENMP
-            tid = omp_get_thread_num();
-#endif
-            ThreadContext& ctx = contexts[static_cast<size_t>(tid)];
-            const int32_t* row = data.row(rows[k]);
-            const Variable& target = bn.vars[static_cast<size_t>(v)];
-            bool parent_ok = true;
-            size_t parent_idx = family_index(target, row, bn.vars, -1, -1, parent_ok);
-            if (!parent_ok) {
-                accumulate_complete_row(bn, row, ctx.counts, 1.0, -1, -1);
-                continue;
-            }
-            double best_score = -std::numeric_limits<double>::infinity();
-            int best_state = 0;
-            for (int x = 0; x < target.r; ++x) {
-                double log_score = safe_log(theta[target.cpt_offset + parent_idx * target.r + x]);
-                for (int child_idx : target.children) {
-                    const Variable& child = bn.vars[static_cast<size_t>(child_idx)];
-                    int32_t child_val = row[child_idx];
-                    if (child_val < 0) continue;
-                    bool child_ok = true;
-                    size_t child_parent_idx = 0;
-                    for (size_t j = 0; j < child.parents.size(); ++j) {
-                        int parent = child.parents[j];
-                        int32_t val = row[parent];
-                        if (parent == v) val = x;
-                        if (val < 0) { child_ok = false; break; }
-                        child_parent_idx += child.parent_strides[j] * static_cast<size_t>(val);
-                    }
-                    if (!child_ok) continue;
-                    double prob = theta[child.cpt_offset + child_parent_idx * static_cast<size_t>(child.r) + static_cast<size_t>(child_val)];
-                    log_score += safe_log(prob);
-                }
-                if (log_score > best_score) { best_score = log_score; best_state = x; }
-            }
-            accumulate_complete_row(bn, row, ctx.counts, 1.0, v, best_state);
-        }
-    }
-    std::fill(counts.begin(), counts.end(), 0.0);
-    for (const auto& ctx : contexts) {
-        for (size_t i = 0; i < total; ++i) counts[i] += ctx.counts[i];
-    }
-}
 
 // Soft E-step bucketed
 void soft_e_step_bucketed(const BN& bn, const Data& data, const std::vector<double>& theta,
                           const Buckets& buckets, const std::vector<int>& visit_order,
-                          std::vector<double>& counts, int threads) {
-    const size_t total = bn.total_cpt_entries;
-    threads = resolve_threads(threads);
-    std::vector<ThreadContext> contexts(static_cast<size_t>(threads));
-    for (auto& ctx : contexts) {
-        ctx.counts.assign(total, 0.0);
-        ctx.scratch.assign(bn.max_states, 0.0);
+                          std::vector<double>& counts, int /*threads*/) {
+    // Initialize counts to zero
+    std::fill(counts.begin(), counts.end(), 0.0);
+    
+    // Allocate workspace for probability computations
+    std::vector<double> state_log_scores(bn.max_states, 0.0);
+    
+    // Phase 1: Process complete rows without missing values
+    for (size_t row_iter = 0; row_iter < buckets.complete.size(); row_iter++) {
+        const int32_t* complete_row = data.row(buckets.complete[row_iter]);
+        accumulate_complete_row(bn, complete_row, counts, 1.0, -1, -1);
     }
-    // Complete rows
-#pragma omp parallel for schedule(static) num_threads(threads)
-    for (size_t k = 0; k < buckets.complete.size(); ++k) {
-        int tid = 0;
-#ifdef _OPENMP
-        tid = omp_get_thread_num();
-#endif
-        ThreadContext& ctx = contexts[static_cast<size_t>(tid)];
-        const int32_t* row = data.row(buckets.complete[k]);
-        accumulate_complete_row(bn, row, ctx.counts, 1.0, -1, -1);
-    }
-    // Buckets
-    for (int v : visit_order) {
-        const auto& rows = buckets.per_var_sorted[static_cast<size_t>(v)];
-        if (rows.empty()) continue;
-#pragma omp parallel for schedule(static) num_threads(threads)
-        for (size_t k = 0; k < rows.size(); ++k) {
-            int tid = 0;
-#ifdef _OPENMP
-            tid = omp_get_thread_num();
-#endif
-            ThreadContext& ctx = contexts[static_cast<size_t>(tid)];
-            const int32_t* row = data.row(rows[k]);
-            const Variable& target = bn.vars[static_cast<size_t>(v)];
-            bool parent_ok = true;
-            size_t parent_idx = family_index(target, row, bn.vars, -1, -1, parent_ok);
-            if (!parent_ok) {
-                accumulate_complete_row(bn, row, ctx.counts, 1.0, -1, -1);
+    
+    // Phase 2: Process bucketed rows with missing values
+    for (const auto& target_var : visit_order) {
+        const auto& bucket_rows = buckets.per_var_sorted[static_cast<size_t>(target_var)];
+        
+        if (bucket_rows.empty()) {
+            continue;
+        }
+        
+        for (size_t bucket_iter = 0; bucket_iter < bucket_rows.size(); bucket_iter++) {
+            const int32_t* current_row = data.row(bucket_rows[bucket_iter]);
+            const Variable& missing_variable = bn.vars[static_cast<size_t>(target_var)];
+            
+            // Check if parent configuration is valid
+            bool parents_observed = true;
+            size_t parent_configuration = family_index(missing_variable, current_row, bn.vars, 
+                                                       -1, -1, parents_observed);
+            
+            if (!parents_observed) {
+                accumulate_complete_row(bn, current_row, counts, 1.0, -1, -1);
                 continue;
             }
-            double max_log = -std::numeric_limits<double>::infinity();
-            for (int x = 0; x < target.r; ++x) {
-                double log_score = safe_log(theta[target.cpt_offset + parent_idx * target.r + x]);
-                for (int child_idx : target.children) {
-                    const Variable& child = bn.vars[static_cast<size_t>(child_idx)];
-                    int32_t child_val = row[child_idx];
-                    if (child_val < 0) continue;
-                    bool child_ok = true;
-                    size_t child_parent_idx = 0;
-                    for (size_t j = 0; j < child.parents.size(); ++j) {
-                        int parent = child.parents[j];
-                        int32_t val = row[parent];
-                        if (parent == v) val = x;
-                        if (val < 0) { child_ok = false; break; }
-                        child_parent_idx += child.parent_strides[j] * static_cast<size_t>(val);
+            
+            // Compute log scores for each possible state
+            double maximum_log_score = -std::numeric_limits<double>::infinity();
+            
+            for (int candidate_state = 0; candidate_state < missing_variable.r; candidate_state++) {
+                // Start with prior probability for this state
+                size_t cpt_index = missing_variable.cpt_offset + parent_configuration * missing_variable.r + candidate_state;
+                double score_accumulator = safe_log(theta[cpt_index]);
+                
+                // Add likelihood from children
+                for (const auto& child_var_idx : missing_variable.children) {
+                    const Variable& child_variable = bn.vars[static_cast<size_t>(child_var_idx)];
+                    int32_t observed_child_state = current_row[child_var_idx];
+                    
+                    if (observed_child_state < 0) {
+                        continue;
                     }
-                    if (!child_ok) continue;
-                    double prob = theta[child.cpt_offset + child_parent_idx * static_cast<size_t>(child.r) + static_cast<size_t>(child_val)];
-                    log_score += safe_log(prob);
+                    
+                    // Compute child's parent configuration
+                    bool child_parents_valid = true;
+                    size_t child_parent_config = 0;
+                    
+                    for (size_t parent_pos = 0; parent_pos < child_variable.parents.size(); parent_pos++) {
+                        int parent_var = child_variable.parents[parent_pos];
+                        int32_t parent_value = current_row[parent_var];
+                        
+                        // Use candidate state if this parent is the missing variable
+                        if (parent_var == target_var) {
+                            parent_value = candidate_state;
+                        }
+                        
+                        if (parent_value < 0) {
+                            child_parents_valid = false;
+                            break;
+                        }
+                        
+                        child_parent_config += child_variable.parent_strides[parent_pos] * static_cast<size_t>(parent_value);
+                    }
+                    
+                    if (!child_parents_valid) {
+                        continue;
+                    }
+                    
+                    // Look up child probability
+                    size_t child_cpt_idx = child_variable.cpt_offset + 
+                                          child_parent_config * static_cast<size_t>(child_variable.r) + 
+                                          static_cast<size_t>(observed_child_state);
+                    double child_probability = theta[child_cpt_idx];
+                    score_accumulator += safe_log(child_probability);
                 }
-                ctx.scratch[static_cast<size_t>(x)] = log_score;
-                if (log_score > max_log) max_log = log_score;
+                
+                state_log_scores[static_cast<size_t>(candidate_state)] = score_accumulator;
+                
+                if (score_accumulator > maximum_log_score) {
+                    maximum_log_score = score_accumulator;
+                }
             }
-            double sum = 0.0;
-            for (int x = 0; x < target.r; ++x) {
-                ctx.scratch[static_cast<size_t>(x)] = std::exp(ctx.scratch[static_cast<size_t>(x)] - max_log);
-                sum += ctx.scratch[static_cast<size_t>(x)];
+            
+            // Convert log scores to probabilities using log-sum-exp trick
+            double probability_sum = 0.0;
+            
+            for (int candidate_state = 0; candidate_state < missing_variable.r; candidate_state++) {
+                double normalized_score = std::exp(state_log_scores[static_cast<size_t>(candidate_state)] - maximum_log_score);
+                state_log_scores[static_cast<size_t>(candidate_state)] = normalized_score;
+                probability_sum += normalized_score;
             }
-            if (sum <= 0.0) {
-                accumulate_complete_row(bn, row, ctx.counts, 1.0, -1, -1);
+            
+            // Handle degenerate case
+            if (probability_sum <= 0.0) {
+                accumulate_complete_row(bn, current_row, counts, 1.0, -1, -1);
                 continue;
             }
-            for (int x = 0; x < target.r; ++x) {
-                double w = ctx.scratch[static_cast<size_t>(x)] / sum;
-                accumulate_complete_row(bn, row, ctx.counts, w, v, x);
+            
+            // Accumulate weighted counts for each state
+            for (int candidate_state = 0; candidate_state < missing_variable.r; candidate_state++) {
+                double state_weight = state_log_scores[static_cast<size_t>(candidate_state)] / probability_sum;
+                accumulate_complete_row(bn, current_row, counts, state_weight, target_var, candidate_state);
             }
         }
-    }
-    std::fill(counts.begin(), counts.end(), 0.0);
-    for (const auto& ctx : contexts) {
-        for (size_t i = 0; i < total; ++i) counts[i] += ctx.counts[i];
     }
 }
 
-void hard_e_step(const BN& bn, const Data& data, const std::vector<double>& theta,
-                 std::vector<double>& counts, int threads) {
-    const size_t total = bn.total_cpt_entries;
-    threads = resolve_threads(threads);
-    std::vector<ThreadContext> contexts(static_cast<size_t>(threads));
-    for (auto& ctx : contexts) {
-        ctx.counts.assign(total, 0.0);
-        ctx.scratch.assign(bn.max_states, 0.0);
-    }
-#pragma omp parallel for schedule(static) num_threads(threads)
-    for (size_t row_idx = 0; row_idx < data.nrows; ++row_idx) {
-        int tid = 0;
-#ifdef _OPENMP
-        tid = omp_get_thread_num();
-#endif
-        ThreadContext& ctx = contexts[static_cast<size_t>(tid)];
-        std::fill(ctx.scratch.begin(), ctx.scratch.end(), -std::numeric_limits<double>::infinity());
-        const int32_t* row = data.row(row_idx);
-        RowInfo info = analyze_row(row, data.nvars);
-        if (info.missing_count == 0) {
-            accumulate_complete_row(bn, row, ctx.counts, 1.0, -1, -1);
-            continue;
-        }
-        if (info.first_missing < 0) {
-            continue;
-        }
-        const Variable& target = bn.vars[static_cast<size_t>(info.first_missing)];
-        bool parent_ok = true;
-        size_t parent_idx = family_index(target, row, bn.vars, -1, -1, parent_ok);
-        if (!parent_ok) {
-            accumulate_complete_row(bn, row, ctx.counts, 1.0, -1, -1);
-            continue;
-        }
-        double best_score = -std::numeric_limits<double>::infinity();
-        int best_state = 0;
-        for (int x = 0; x < target.r; ++x) {
-            double log_score = safe_log(theta[target.cpt_offset + parent_idx * target.r + x]);
-            for (int child_idx : target.children) {
-                const Variable& child = bn.vars[static_cast<size_t>(child_idx)];
-                int32_t child_val = row[child_idx];
-                if (child_val < 0) {
-                    continue;
-                }
-                bool child_ok = true;
-                size_t child_parent_idx = 0;
-                for (size_t j = 0; j < child.parents.size(); ++j) {
-                    int parent = child.parents[j];
-                    int32_t val = row[parent];
-                    if (parent == info.first_missing) {
-                        val = x;
-                    }
-                    if (val < 0) {
-                        child_ok = false;
-                        break;
-                    }
-                    child_parent_idx += child.parent_strides[j] * static_cast<size_t>(val);
-                }
-                if (!child_ok) {
-                    continue;
-                }
-                double prob =
-                    theta[child.cpt_offset + child_parent_idx * static_cast<size_t>(child.r) +
-                          static_cast<size_t>(child_val)];
-                log_score += safe_log(prob);
-            }
-            ctx.scratch[static_cast<size_t>(x)] = log_score;
-            if (log_score > best_score) {
-                best_score = log_score;
-                best_state = x;
-            }
-        }
-        accumulate_complete_row(bn, row, ctx.counts, 1.0, info.first_missing, best_state);
-    }
-    std::fill(counts.begin(), counts.end(), 0.0);
-    for (const auto& ctx : contexts) {
-        for (size_t i = 0; i < total; ++i) {
-            counts[i] += ctx.counts[i];
-        }
-    }
-}
 
 void soft_e_step(const BN& bn, const Data& data, const std::vector<double>& theta,
-                 std::vector<double>& counts, int threads) {
-    const size_t total = bn.total_cpt_entries;
-    threads = resolve_threads(threads);
-    std::vector<ThreadContext> contexts(static_cast<size_t>(threads));
-    for (auto& ctx : contexts) {
-        ctx.counts.assign(total, 0.0);
-        ctx.scratch.assign(bn.max_states, 0.0);
-    }
-#pragma omp parallel for schedule(static) num_threads(threads)
+                 std::vector<double>& counts, int /*threads*/) {
+    std::fill(counts.begin(), counts.end(), 0.0);
+    std::vector<double> scratch(bn.max_states, 0.0);
     for (size_t row_idx = 0; row_idx < data.nrows; ++row_idx) {
-        int tid = 0;
-#ifdef _OPENMP
-        tid = omp_get_thread_num();
-#endif
-        ThreadContext& ctx = contexts[static_cast<size_t>(tid)];
         const int32_t* row = data.row(row_idx);
         RowInfo info = analyze_row(row, data.nvars);
         if (info.missing_count == 0) {
-            accumulate_complete_row(bn, row, ctx.counts, 1.0, -1, -1);
+            accumulate_complete_row(bn, row, counts, 1.0, -1, -1);
             continue;
         }
         if (info.first_missing < 0) {
-            accumulate_complete_row(bn, row, ctx.counts, 1.0, -1, -1);
+            accumulate_complete_row(bn, row, counts, 1.0, -1, -1);
             continue;
         }
         const Variable& target = bn.vars[static_cast<size_t>(info.first_missing)];
         bool parent_ok = true;
         size_t parent_idx = family_index(target, row, bn.vars, -1, -1, parent_ok);
         if (!parent_ok) {
-            accumulate_complete_row(bn, row, ctx.counts, 1.0, -1, -1);
+            accumulate_complete_row(bn, row, counts, 1.0, -1, -1);
             continue;
         }
         double max_log = -std::numeric_limits<double>::infinity();
@@ -1051,29 +1119,23 @@ void soft_e_step(const BN& bn, const Data& data, const std::vector<double>& thet
                           static_cast<size_t>(child_val)];
                 log_score += safe_log(prob);
             }
-            ctx.scratch[static_cast<size_t>(x)] = log_score;
+            scratch[static_cast<size_t>(x)] = log_score;
             if (log_score > max_log) {
                 max_log = log_score;
             }
         }
         double sum = 0.0;
         for (int x = 0; x < target.r; ++x) {
-            ctx.scratch[static_cast<size_t>(x)] = std::exp(ctx.scratch[static_cast<size_t>(x)] - max_log);
-            sum += ctx.scratch[static_cast<size_t>(x)];
+            scratch[static_cast<size_t>(x)] = std::exp(scratch[static_cast<size_t>(x)] - max_log);
+            sum += scratch[static_cast<size_t>(x)];
         }
         if (sum <= 0.0) {
-            accumulate_complete_row(bn, row, ctx.counts, 1.0, -1, -1);
+            accumulate_complete_row(bn, row, counts, 1.0, -1, -1);
             continue;
         }
         for (int x = 0; x < target.r; ++x) {
-            double weight = ctx.scratch[static_cast<size_t>(x)] / sum;
-            accumulate_complete_row(bn, row, ctx.counts, weight, info.first_missing, x);
-        }
-    }
-    std::fill(counts.begin(), counts.end(), 0.0);
-    for (const auto& ctx : contexts) {
-        for (size_t i = 0; i < total; ++i) {
-            counts[i] += ctx.counts[i];
+            double weight = scratch[static_cast<size_t>(x)] / sum;
+            accumulate_complete_row(bn, row, counts, weight, info.first_missing, x);
         }
     }
 }
@@ -1090,36 +1152,92 @@ double effective_alpha(const Variable& var, double user_alpha) {
 
 void m_step(const BN& bn, const std::vector<double>& counts, double user_alpha,
             bool use_bdeu, double user_ess, std::vector<double>& theta) {
-    for (size_t vidx = 0; vidx < bn.vars.size(); ++vidx) {
-        const Variable& var = bn.vars[vidx];
-        double alpha = 0.0;
-        double alpha_sum = 0.0;
-        double alpha_cell = 0.0;
+    const size_t total_variables = bn.vars.size();
+    
+    for (size_t var_index = 0; var_index < total_variables; var_index++) {
+        const Variable& current_var = bn.vars[var_index];
+        
+        // Determine prior strength based on scoring method
+        double dirichlet_prior = 0.0;
+        double bdeu_prior_cell = 0.0;
+        
         if (use_bdeu) {
-            double ess = (user_ess > 0.0) ? user_ess : 5.0; // default ESS
-            alpha_cell = ess / (static_cast<double>(var.r) * static_cast<double>(var.q));
-            alpha_sum = alpha_cell * static_cast<double>(var.r);
+            double equivalent_sample_size = (user_ess > 0.0) ? user_ess : 5.0;
+            double total_configs = static_cast<double>(current_var.r) * static_cast<double>(current_var.q);
+            bdeu_prior_cell = equivalent_sample_size / total_configs;
         } else {
-            alpha = effective_alpha(var, user_alpha);
-            alpha_sum = alpha * static_cast<double>(var.r);
+            dirichlet_prior = effective_alpha(current_var, user_alpha);
         }
-        for (size_t u = 0; u < var.q; ++u) {
-            size_t base = var.cpt_offset + u * static_cast<size_t>(var.r);
-            double total = 0.0;
-            for (int s = 0; s < var.r; ++s) {
-                total += counts[base + static_cast<size_t>(s)];
-            }
-            double denom = total + alpha_sum;
-            if (denom <= 0.0) {
-                double uniform = 1.0 / static_cast<double>(var.r);
-                for (int s = 0; s < var.r; ++s) {
-                    theta[base + static_cast<size_t>(s)] = uniform;
+        
+        // Process each parent configuration
+        for (size_t parent_config = 0; parent_config < current_var.q; parent_config++) {
+            size_t config_base_idx = current_var.cpt_offset + parent_config * static_cast<size_t>(current_var.r);
+            
+            double probability_mass_fixed = 0.0;
+            size_t learnable_params = 0;
+            double learnable_sum = 0.0;
+            
+            // First pass: handle fixed entries and accumulate learnable statistics
+            for (int state_idx = 0; state_idx < current_var.r; state_idx++) {
+                size_t entry_index = config_base_idx + static_cast<size_t>(state_idx);
+                
+                bool is_fixed_entry = (entry_index < bn.fixed_mask.size() && bn.fixed_mask[entry_index]);
+                
+                if (is_fixed_entry) {
+                    double fixed_prob = bn.fixed_values[entry_index];
+                    theta[entry_index] = fixed_prob;
+                    probability_mass_fixed += fixed_prob;
+                } else {
+                    double prior_value = use_bdeu ? bdeu_prior_cell : dirichlet_prior;
+                    double posterior_numerator = counts[entry_index] + prior_value;
+                    learnable_sum += posterior_numerator;
+                    learnable_params++;
                 }
+            }
+            
+            // Calculate remaining probability mass for learnable parameters
+            double available_mass = 1.0 - probability_mass_fixed;
+            
+            if (available_mass < 0.0) {
+                available_mass = 0.0;
+            } else if (available_mass > 1.0) {
+                available_mass = 1.0;
+            }
+            
+            // Skip if no learnable parameters
+            if (learnable_params == 0) {
                 continue;
             }
-            for (int s = 0; s < var.r; ++s) {
-                double numerator = counts[base + static_cast<size_t>(s)] + (use_bdeu ? alpha_cell : alpha);
-                theta[base + static_cast<size_t>(s)] = numerator / denom;
+            
+            // Second pass: assign probabilities to learnable parameters
+            if (learnable_sum <= 0.0) {
+                // Fallback to uniform distribution over learnable states
+                double uniform_prob = (learnable_params > 0) ? (available_mass / static_cast<double>(learnable_params)) : 0.0;
+                
+                for (int state_idx = 0; state_idx < current_var.r; state_idx++) {
+                    size_t entry_index = config_base_idx + static_cast<size_t>(state_idx);
+                    bool is_learnable = (entry_index < bn.fixed_mask.size() && !bn.fixed_mask[entry_index]);
+                    
+                    if (is_learnable) {
+                        theta[entry_index] = uniform_prob;
+                    }
+                }
+            } else {
+                // Normalize by posterior counts
+                for (int state_idx = 0; state_idx < current_var.r; state_idx++) {
+                    size_t entry_index = config_base_idx + static_cast<size_t>(state_idx);
+                    
+                    bool is_fixed_entry = (entry_index < bn.fixed_mask.size() && bn.fixed_mask[entry_index]);
+                    
+                    if (is_fixed_entry) {
+                        continue;
+                    }
+                    
+                    double prior_value = use_bdeu ? bdeu_prior_cell : dirichlet_prior;
+                    double posterior_numerator = counts[entry_index] + prior_value;
+                    double normalized_prob = (available_mass <= 0.0) ? 0.0 : (available_mass * posterior_numerator / learnable_sum);
+                    theta[entry_index] = normalized_prob;
+                }
             }
         }
     }
@@ -1135,6 +1253,7 @@ void uniform_initialize(const BN& bn, std::vector<double>& theta) {
             }
         }
     }
+    apply_fixed_entries(bn, theta);
 }
 
 void random_dirichlet_initialize(const BN& bn, std::vector<double>& theta, std::mt19937& rng) {
@@ -1154,6 +1273,7 @@ void random_dirichlet_initialize(const BN& bn, std::vector<double>& theta, std::
             }
         }
     }
+    apply_fixed_entries(bn, theta);
 }
 
 void initialize_from_complete_rows(const BN& bn, const Data& data, double user_alpha,
@@ -1167,6 +1287,7 @@ void initialize_from_complete_rows(const BN& bn, const Data& data, double user_a
         }
     }
     m_step(bn, counts, user_alpha, use_bdeu, user_ess, theta);
+    apply_fixed_entries(bn, theta);
 }
 
 double compute_row_logprob(const BN& bn, const std::vector<double>& theta,
@@ -1191,18 +1312,10 @@ double compute_row_logprob(const BN& bn, const std::vector<double>& theta,
 }
 
 double compute_loglik(const BN& bn, const Data& data, const std::vector<double>& theta,
-                      int threads) {
+                      int /*threads*/) {
     double total_loglik = 0.0;
-    threads = resolve_threads(threads);
-    std::vector<std::vector<double>> scratch(static_cast<size_t>(threads),
-                                             std::vector<double>(bn.max_states, 0.0));
-#pragma omp parallel for reduction(+ : total_loglik) schedule(static) num_threads(threads)
+    std::vector<double> log_scores(bn.max_states, 0.0);
     for (size_t row_idx = 0; row_idx < data.nrows; ++row_idx) {
-        int tid = 0;
-#ifdef _OPENMP
-        tid = omp_get_thread_num();
-#endif
-        std::vector<double>& log_scores = scratch[static_cast<size_t>(tid)];
         const int32_t* row = data.row(row_idx);
         RowInfo info = analyze_row(row, data.nvars);
         if (info.missing_count == 0) {
@@ -1356,12 +1469,6 @@ void write_bif(const std::string& path, const BN& bn, const std::vector<double>&
     }
 }
 
-// ============================================================================
-// CORE EM ALGORITHM - Extracted for clarity
-// See em_algorithm.cpp for the pure algorithm implementation
-// ============================================================================
-#include "em_algorithm.cpp"
-
 }  // namespace
 
 int main(int argc, char** argv) {
@@ -1369,37 +1476,66 @@ int main(int argc, char** argv) {
     std::ios::sync_with_stdio(false);
     std::cin.tie(nullptr);
     try {
-        // Parse command-line arguments
         ArgParser parser(argc, argv);
         CLIOptions options = parser.parse();
-        
-        // Load Bayesian Network structure and data
         BN bn = parse_bif(options.bif_input);
         Data data = load_data(options.data_input, bn);
-        
-        // Run the core EM learning algorithm (see em_algorithm.cpp)
+        // Precompute scheduling and buckets for soft E-step
+        auto topo = topological_order(bn);
+        auto mb = build_markov_blankets(bn);
+        auto buckets = build_buckets(bn, data, mb);
+
+        // Alpha sweep: 0.1, 0.2, ..., 1.0
+        std::vector<double> alpha_sweep;
+        for (int i = 1; i <= 10; ++i) alpha_sweep.push_back(static_cast<double>(i) / 10.0);
+
         std::vector<double> best_theta;
+        double best_loglik = -std::numeric_limits<double>::infinity();
         double best_alpha = -1.0;
         int best_iters_run = 0;
-        double best_loglik = run_em_algorithm(
-            bn, data, options.iters, 1e-5,
-            best_theta, best_alpha, best_iters_run
-        );
-        
-        // Sanity check CPTs (optional)
+
+        for (double this_alpha : alpha_sweep) {
+            std::vector<double> theta(bn.total_cpt_entries, 0.0);
+            // Initialize from complete rows; falls back to uniform where needed
+            initialize_from_complete_rows(bn, data, this_alpha, /*use_bdeu=*/false, /*ess=*/0.0, theta);
+
+            std::vector<double> counts(bn.total_cpt_entries, 0.0);
+            double prev_loglik = -std::numeric_limits<double>::infinity();
+            double loglik = prev_loglik;
+            int iterations_run = 0;
+            for (int iter = 0; iter < options.iters; ++iter) {
+                soft_e_step_bucketed(bn, data, theta, buckets, topo, counts, /*threads=*/0);
+                m_step(bn, counts, this_alpha, /*use_bdeu=*/false, /*ess=*/0.0, theta);
+                loglik = compute_loglik(bn, data, theta, /*threads=*/0);
+                ++iterations_run;
+                if (iter > 0) {
+                    double denom = std::max(1.0, std::fabs(prev_loglik));
+                    if ((loglik - prev_loglik) / denom < 1e-5) {
+                        break;
+                    }
+                }
+                prev_loglik = loglik;
+            }
+            if (loglik > best_loglik) {
+                best_loglik = loglik;
+                best_theta = std::move(theta);
+                best_alpha = this_alpha;
+                best_iters_run = iterations_run;
+            }
+        }
+
         if (options.check && !check_cpts(bn, best_theta)) {
             throw std::runtime_error("CPT check failed: some rows do not sum to 1");
         }
-        
-        // Write learned parameters to output file
         write_bif(options.bif_output, bn, best_theta);
-        
-        // Print summary statistics
-        print_algorithm_summary(
-            data.nrows, data.single_missing_rows,
-            best_iters_run, best_alpha, best_loglik
-        );
-        
+        double single_missing_pct =
+            data.nrows > 0 ? 100.0 * static_cast<double>(data.single_missing_rows) / data.nrows : 0.0;
+        std::ostringstream summary;
+        summary << "rows=" << data.nrows << " single_missing=" << std::fixed << std::setprecision(2)
+                << single_missing_pct << "% iters=" << best_iters_run
+                << " best_alpha=" << best_alpha
+                << " loglik=" << std::setprecision(6) << best_loglik << "\n";
+        std::cerr << summary.str();
     } catch (const std::exception& ex) {
         std::cerr << "Error: " << ex.what() << "\n";
         return 1;
